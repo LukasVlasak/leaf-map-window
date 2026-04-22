@@ -1,0 +1,51 @@
+{
+  "name": "leaf-map-window",
+  "version": "1.0.0",
+  "description": "Interaktivní webová aplikace pro vizualizaci prostorových dat s využitím knihovny Leaflet, jeho rozšířeních a 3D mapových technologií",
+  "main": "dist/leaf-map-window.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "webpack && tsc --project tsconfig.build.json --emitDeclarationOnly --noEmit false",
+    "build:watch": "webpack --watch",
+    "demo": "webpack serve --env demo",
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "leaflet": "^1.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LukasVlasak/leaf-map-window.git"
+  },
+  "keywords": [
+    "leaflet",
+    "leafletjs",
+    "maps",
+    "spatial-data",
+    "gis",
+    "javascript",
+    "web-app"
+  ],
+  "author": "Lukas Vlasak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LukasVlasak/leaf-map-window/issues"
+  },
+  "homepage": "https://github.com/LukasVlasak/leaf-map-window#readme",
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "css-loader": "^7.1.4",
+    "html-webpack-plugin": "^5.6.7",
+    "leaflet": "^1.9.4",
+    "mini-css-extract-plugin": "^2.10.2",
+    "sass": "^1.99.0",
+    "sass-loader": "^16.0.7",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.7",
+    "typescript": "^6.0.3",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2",
+    "webpack-dev-server": "^5.2.3"
+  }
+}

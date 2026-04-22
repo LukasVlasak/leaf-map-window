@@ -1,0 +1,7 @@
+# .npmignore
+src/
+demo/
+.idea/
+node_modules/
+*.config.js
+tsconfig*.json
