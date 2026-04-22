@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "Interaktivní webová aplikace pro vizualizaci prostorových dat s využitím knihovny Leaflet, jeho rozšířeních a 3D mapových technologií",
   "main": "dist/leaf-map-window.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": ["dist"],
   "scripts": {
     "build": "webpack && tsc --project tsconfig.build.json --emitDeclarationOnly --noEmit false",
-    "build:watch": "webpack --watch",
     "demo": "webpack serve --env demo",
     "type-check": "tsc --noEmit"
   },

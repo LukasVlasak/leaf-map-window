@@ -32,6 +32,9 @@ module.exports = (env = {}) => {
       },
       resolve: {
         extensions: ['.ts', '.js'],
+        alias: {
+          'leaf-map-window': path.resolve(__dirname, 'src/index.ts'),
+        },
       },
       module: {
         rules: [
