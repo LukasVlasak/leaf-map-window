@@ -64,6 +64,7 @@ module.exports = (env = {}) => {
       library: {
         name: 'LeafMapWindow',
         type: 'umd',
+        export: 'default',
       },
       globalObject: 'this',
       clean: true,
