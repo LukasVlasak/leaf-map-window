@@ -1,0 +1,22 @@
+$primaryColor: #0d9488;
+$primaryHoverColor: #0f766e;
+$primaryIconBoxShadow: 0 2px 6px rgba(13, 148, 136, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+
+$iconHoverColor: #fafaf7;
+// Tlumené pozadí pro taby, hover stavy, badges a podobné plochy
+$bgSurfaceMuted: #fafaf7;
+
+$textColor: #111111;
+$mutedTextColor: #8a8a85;
+$secondaryTextColor: #5a5a56;
+
+$borderStrong: rgba(17, 17, 17, 0.14);
+$primaryPanelBoxShadow: 0 2px 6px rgba(17, 17, 17, 0.06), 0 12px 32px rgba(17, 17, 17, 0.10);
+$secondaryPanelBoxShadow: 0 1px 2px rgba(17, 17, 17, 0.04), 0 4px 14px rgba(17, 17, 17, 0.06);
+
+$panelBorderRadius: 14px;
+$iconRadius: 8px;
+$barRadius: 999px;
+
+$transitionFast: 220ms cubic-bezier(.4, 0, .2, 1);
+$transition: 120ms cubic-bezier(.4, 0, .2, 1);

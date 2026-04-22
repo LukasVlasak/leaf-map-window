@@ -1,0 +1,63 @@
+@use "../../styles/variables" as vars;
+
+.search {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 400;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+
+  &-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid vars.$borderStrong;
+    border-radius: vars.$barRadius;
+    box-shadow: vars.$secondaryPanelBoxShadow;
+    transition: box-shadow vars.$transitionFast, border-color vars.$transitionFast;
+
+    &:focus-within {
+      box-shadow: vars.$primaryPanelBoxShadow;
+    }
+  }
+
+  &-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    padding-right: 10px;
+    margin-right: 2px;
+    border-right: 1px solid vars.$borderStrong;
+    color: vars.$textColor;
+
+    .mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: vars.$textColor;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+  }
+
+  input {
+    flex: 1;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    padding: 2px 0;
+    min-width: 0;
+
+    &::placeholder {
+      color: vars.$mutedTextColor;
+    }
+  }
+}

@@ -1,0 +1,42 @@
+@use "../../styles/variables" as vars;
+
+.info-bar {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 400;
+  background: white;
+  border: 1px solid vars.$borderStrong;
+  border-radius: vars.$barRadius;
+  box-shadow: vars.$secondaryPanelBoxShadow;
+  padding: 8px 14px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  font-size: 12px;
+  white-space: nowrap;
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .info-label {
+      color: vars.$mutedTextColor;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: vars.$textColor;
+    }
+  }
+
+  .info-sep {
+    width: 1px;
+    height: 14px;
+    background: vars.$borderStrong;
+  }
+}

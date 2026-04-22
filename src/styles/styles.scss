@@ -1,0 +1,17 @@
+@use "variables";
+@use "../view/SearchBar/SearchBar";
+@use "../view/LeftSidebar/LeftSidebar";
+@use "../view/MapControls/MapControls";
+@use "../view/MapLayers/MapLayers";
+@use "../view/MapStatusBar/MapStatusBar";
+@use "../view/AttributionControl/AttributionControl";
+@use "../view/components/Button/LeafButton";
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+#map {
+  height: 100%;
+}

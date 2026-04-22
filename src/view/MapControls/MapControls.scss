@@ -1,0 +1,59 @@
+@use "../../styles/variables" as vars;
+
+.br-cluster {
+  position: absolute;
+  bottom: 54px;
+  right: 16px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .control-stack {
+    background: white;
+    border: 1px solid vars.$borderStrong;
+    border-radius: vars.$panelBorderRadius;
+    box-shadow: vars.$secondaryPanelBoxShadow;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .ctl-btn {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: vars.$iconRadius;
+      color: vars.$secondaryTextColor;
+      transition: background vars.$transition, color vars.$transition, transform vars.$transition;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        background: vars.$bgSurfaceMuted;
+        color: vars.$textColor;
+      }
+
+      &:active {
+        transform: scale(0.94);
+      }
+
+      &.active {
+        color: white;
+        background: vars.$primaryColor;
+        box-shadow: vars.$primaryIconBoxShadow;
+      }
+    }
+
+    .ctl-divider {
+      height: 1px;
+      background: vars.$borderStrong;
+      margin: 3px 4px;
+    }
+  }
+}
