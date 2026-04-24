@@ -4,7 +4,9 @@
   "description": "Interaktivní webová aplikace pro vizualizaci prostorových dat s využitím knihovny Leaflet, jeho rozšířeních a 3D mapových technologií",
   "main": "dist/leaf-map-window.js",
   "types": "dist/types/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "webpack && tsc --project tsconfig.build.json --emitDeclarationOnly --noEmit false",
     "demo": "webpack serve --env demo",
@@ -46,5 +48,8 @@
     "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2",
     "webpack-dev-server": "^5.2.3"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0"
   }
 }

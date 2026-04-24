@@ -1,10 +1,52 @@
 @use "../../styles/variables" as vars;
 
+.leaflet-bottom.leaflet-right {
+  bottom: 116px;
+  right: 16px;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid vars.$borderLight !important;
+  background: white;
+  border-radius: vars.$panelBorderRadius !important;
+  box-shadow: vars.$secondaryPanelBoxShadow !important;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 !important;
+
+  a, a:first-child, a:last-child {
+    width: 40px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    background: white !important;
+    border: none !important;
+    border-radius: vars.$iconRadius !important;
+    color: vars.$secondaryTextColor !important;
+    font-size: 21px !important;
+    font-weight: 400 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    transition: background vars.$transition, color vars.$transition, transform vars.$transition;
+
+    &:hover {
+      background: vars.$bgSurfaceMuted !important;
+      color: vars.$textColor !important;
+    }
+
+    &:active {
+      transform: scale(0.94);
+    }
+  }
+}
+
 .br-cluster {
   position: absolute;
   bottom: 54px;
   right: 16px;
-  z-index: 400;
+  z-index: 620;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -29,9 +71,8 @@
       color: vars.$secondaryTextColor;
       transition: background vars.$transition, color vars.$transition, transform vars.$transition;
 
-      svg {
-        width: 18px;
-        height: 18px;
+      i {
+        font-size: 16px;
       }
 
       &:hover {
@@ -48,12 +89,6 @@
         background: vars.$primaryColor;
         box-shadow: vars.$primaryIconBoxShadow;
       }
-    }
-
-    .ctl-divider {
-      height: 1px;
-      background: vars.$borderStrong;
-      margin: 3px 4px;
     }
   }
 }
