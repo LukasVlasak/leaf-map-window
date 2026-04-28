@@ -1,4 +1,4 @@
-export default class AttributionControl extends HTMLElement {
+export default class AttributionControlView extends HTMLElement {
     constructor() {
         super();
     }
@@ -9,4 +9,4 @@ export default class AttributionControl extends HTMLElement {
     }
 }
 
-customElements.define('leaf-attribution-control', AttributionControl);
+customElements.define('leaf-attribution-control', AttributionControlView);

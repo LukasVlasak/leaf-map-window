@@ -32,6 +32,14 @@
     .info-value {
       color: vars.$textColor;
     }
+
+    .scale-graphics {
+      margin-left: 5px;
+      display: inline-block;
+      height: 5px;
+      border: 1px solid black;
+      border-top: none;
+    }
   }
 
   .info-sep {

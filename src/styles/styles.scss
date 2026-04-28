@@ -1,7 +1,8 @@
 @use "variables";
+
 @use "../view/SearchBar/SearchBar";
 @use "../view/LeftSidebar/LeftSidebar";
-@use "../view/MapControls/MapControls";
+@use "../view/MapControls/MapControl";
 @use "../view/MapLayers/MapLayers";
 @use "../view/MapStatusBar/MapStatusBar";
 @use "../view/AttributionControl/AttributionControl";

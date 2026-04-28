@@ -1,10 +1,12 @@
 import * as L from "leaflet";
-import LeftSidebar from "./view/LeftSidebar/LeftSidebar";
-import MapControls from "./view/MapControls/MapControls";
-import MapLayers from "./view/MapLayers/MapLayers";
-import SearchBar from "./view/SearchBar/SearchBar";
-import MapStatusBar from "./view/MapStatusBar/MapStatusBar";
-import AttributionControl from "./view/AttributionControl/AttributionControl";
+import LeftSidebarView from "./view/LeftSidebar/LeftSidebarView";
+import MapControlView from "./view/MapControls/MapControlView";
+import MapControlModel from "./model/MapControlModel";
+import MapLayersView from "./view/MapLayers/MapLayersView";
+import SearchBarView from "./view/SearchBar/SearchBarView";
+import MapStatusBarView from "./view/MapStatusBar/MapStatusBarView";
+import AttributionControlView from "./view/AttributionControl/AttributionControlView";
+import MapStatusBarModel from "./model/MapStatusBarModel";
 
 export default class MapWindow {
     map: L.Map;
@@ -25,11 +27,19 @@ export default class MapWindow {
 
     private initView(): void {
         const container = this.map.getContainer();
-        container.appendChild(new LeftSidebar());
-        container.appendChild(new MapControls(this.map));
-        container.appendChild(new MapLayers());
-        container.appendChild(new SearchBar());
-        container.appendChild(new MapStatusBar());
-        container.appendChild(new AttributionControl());
+        container.appendChild(new LeftSidebarView());
+
+        const mapControlView = new MapControlView();
+        container.appendChild(mapControlView);
+        new MapControlModel(mapControlView, this.map);
+
+        container.appendChild(new MapLayersView());
+        container.appendChild(new SearchBarView());
+
+        const mapStatusBarView = new MapStatusBarView();
+        container.appendChild(mapStatusBarView);
+        new MapStatusBarModel(mapStatusBarView, this.map);
+
+        container.appendChild(new AttributionControlView());
     }
 }
