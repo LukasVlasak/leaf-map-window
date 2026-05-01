@@ -8,7 +8,7 @@ import MapStatusBarView from "./view/MapStatusBar/MapStatusBarView";
 import AttributionControlView from "./view/AttributionControl/AttributionControlView";
 import MapStatusBarModel from "./model/MapStatusBarModel";
 import LeftSidebarModel from "./model/LeftSidebarModel";
-import ObjectStore from "./model/ObjectStore";
+import ObjectStore from "./store/ObjectStore";
 
 export default class MapWindow {
     map: L.Map;

@@ -1,6 +1,6 @@
 import * as L from "leaflet";
 import "leaflet-draw";
-import type ObjectStore from "./ObjectStore";
+import type ObjectStore from "../store/ObjectStore";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 
