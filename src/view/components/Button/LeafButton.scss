@@ -1,22 +1,30 @@
 @use "../../../styles/variables" as vars;
 
 .btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 14px;
   border-radius: vars.$iconRadius;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
+  color: vars.$secondaryTextColor;
   transition: background vars.$transition, color vars.$transition, transform vars.$transition;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: vars.$iconHoverColor;
+    color: vars.$textColor;
+  }
 
   &:active {
     transform: scale(0.96);
   }
 
-  &--primary {
+  &.active {
     background: vars.$primaryColor;
     color: white;
     box-shadow: vars.$primaryIconBoxShadow;
@@ -26,12 +34,33 @@
     }
   }
 
-  &--ghost {
-    color: vars.$secondaryTextColor;
+  &[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: vars.$textColor;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 620;
+    letter-spacing: 0.01em;
+  }
 
-    &:hover {
-      background: vars.$bgSurfaceMuted;
-      color: vars.$textColor;
-    }
+  &[data-tip]:hover::before {
+    content: "";
+    position: absolute;
+    left: calc(100% + 4px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-right-color: vars.$textColor;
+    z-index: 620;
+    pointer-events: none;
   }
 }

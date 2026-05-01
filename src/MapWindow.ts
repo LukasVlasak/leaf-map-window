@@ -7,15 +7,15 @@ import SearchBarView from "./view/SearchBar/SearchBarView";
 import MapStatusBarView from "./view/MapStatusBar/MapStatusBarView";
 import AttributionControlView from "./view/AttributionControl/AttributionControlView";
 import MapStatusBarModel from "./model/MapStatusBarModel";
+import LeftSidebarModel from "./model/LeftSidebarModel";
+import ObjectStore from "./model/ObjectStore";
 
 export default class MapWindow {
     map: L.Map;
+    element: string;
 
-    constructor(
-        element: string = 'map',
-        view: L.LatLngExpression = [50.08, 14.44],
-        zoom: number = 13,
-    ) {
+    constructor(element: string = 'map', view: L.LatLngExpression = [50.08, 14.44], zoom: number = 13) {
+        this.element = element;
         this.map = L.map(element, { attributionControl: false }).setView(view, zoom);
         this.map.zoomControl.setPosition('bottomright');
     }
@@ -27,7 +27,12 @@ export default class MapWindow {
 
     private initView(): void {
         const container = this.map.getContainer();
-        container.appendChild(new LeftSidebarView());
+
+        const objectStore = new ObjectStore(this.map);
+
+        const leftSideBarView = new LeftSidebarView();
+        container.appendChild(leftSideBarView);
+        new LeftSidebarModel(objectStore, leftSideBarView, this.map, this.element);
 
         const mapControlView = new MapControlView();
         container.appendChild(mapControlView);

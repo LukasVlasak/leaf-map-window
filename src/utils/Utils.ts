@@ -4,7 +4,7 @@ export interface NiceDistance {
 }
 
 export default class Utils {
-    static niceRoundDistance(meters): NiceDistance {
+    static niceRoundDistance(meters: number): NiceDistance {
         const pow10 = Math.pow(10, Math.floor(Math.log10(meters)));
         const d = meters / pow10;
 

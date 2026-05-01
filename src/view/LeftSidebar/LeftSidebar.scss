@@ -1,5 +1,9 @@
 @use "../../styles/variables" as vars;
 
+.leaflet-draw-tooltip {
+  display: none;
+}
+
 .tools {
   position: absolute;
   top: 84px;
