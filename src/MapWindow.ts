@@ -33,7 +33,7 @@ export default class MapWindow {
         const objectStore = new ObjectStore(this.map);
 
         const canvasView = new CanvasView();
-        container.appendChild(canvasView);
+        document.body.appendChild(canvasView);
         const canvasModel = new CanvasModel(objectStore, canvasView);
 
         const leftSideBarView = new LeftSidebarView();

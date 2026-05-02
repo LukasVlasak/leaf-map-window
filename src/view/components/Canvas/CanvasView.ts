@@ -140,6 +140,30 @@ export default class CanvasView extends HTMLElement {
         }
     }
 
+    deactivateControlButtons(doNotDeactivate?: DrawType) {
+        if (doNotDeactivate !== "circle") {
+            this._drawCircle!.deactive();
+        }
+        if (doNotDeactivate !== "polygon") {
+            this._drawPolygon!.deactive();
+        }
+        if (doNotDeactivate !== "line") {
+            this._drawLine!.deactive();
+        }
+        if (doNotDeactivate !== "polyline") {
+            this._drawPolyline!.deactive();
+        }
+        if (doNotDeactivate !== "text") {
+            this._addText!.deactive();
+        }
+        if (doNotDeactivate !== "point") {
+            this._addPoint!.deactive();
+        }
+        if (doNotDeactivate !== "freedraw") {
+            this._freeDraw!.deactive();
+        }
+    }
+
     onDrawCircleClick(handler: () => void) {
         this._drawCircle!.addEventListener('click', handler);
     }
