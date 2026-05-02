@@ -42,6 +42,8 @@ export default class CanvasView extends HTMLElement {
         header.appendChild(this._closeButton);
         this.appendChild(header);
 
+        this._initDrag(header);
+
         const controlSection = document.createElement("div");
         controlSection.className = 'control-section';
 
@@ -105,6 +107,35 @@ export default class CanvasView extends HTMLElement {
         footer.appendChild(this._saveButton);
 
         this.appendChild(footer);
+    }
+
+    private _initDrag(handle: HTMLElement): void {
+        let startX = 0;
+        let startY = 0;
+        let startLeft = 0;
+        let startTop = 0;
+
+        const onMouseMove = (e: MouseEvent) => {
+            this.style.left = startLeft + (e.clientX - startX) + 'px';
+            this.style.top = startTop + (e.clientY - startY) + 'px';
+        };
+
+        const onMouseUp = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.body.style.userSelect = '';
+        };
+
+        handle.addEventListener('mousedown', (e: MouseEvent) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = parseInt(this.style.left) || 0;
+            startTop = parseInt(this.style.top) || 0;
+            document.body.style.userSelect = 'none';
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
     }
 
     setContainerDimensions(width: number, height: number, left: number, top: number) {
