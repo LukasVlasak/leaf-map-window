@@ -1,0 +1,49 @@
+.canvas-container {
+  position: absolute;
+  z-index: 1001; // above all content
+  // calculating via calculateContainerDimensions
+  width: 0;
+  height: 0;
+  left: 0;
+  top: 0;
+
+  .canvas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: white;
+    border-bottom: 1px solid black;
+  }
+
+  .control-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: white;
+
+    div {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .canvas-section {
+    display: flex;
+    justify-content: space-between;
+
+    .sidebar {
+      background: white;
+      width: 15px;
+    }
+  }
+
+  .canvas-footer {
+    width: calc(100% - 40px);
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+    background: white;
+  }
+}

@@ -1,29 +1,27 @@
 @use "../../../styles/variables" as vars;
 
-.btn {
+.canvas-btn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
+  margin-right: 5px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: vars.$iconRadius;
   color: vars.$secondaryTextColor;
-  transition: background vars.$transition, color vars.$transition, transform vars.$transition;
-
-  &.text-button {
-    width: unset;
-    height: unset;
-    padding: 12px 20px;
-  }
+  background: transparent;
+  border: 1px solid vars.$borderStrong;
+  transition: background vars.$transition, color vars.$transition, border-color vars.$transition, transform vars.$transition;
 
   i {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   &:hover {
     cursor: pointer;
-    background: vars.$iconHoverColor;
+    background: #ededea;
+    border-color: rgba(17, 17, 17, 0.22);
     color: vars.$textColor;
   }
 
@@ -34,30 +32,11 @@
   &.active {
     background: vars.$primaryColor;
     color: white;
+    border-color: transparent;
     box-shadow: vars.$primaryIconBoxShadow;
 
     &:hover {
       background: vars.$primaryHoverColor;
-    }
-  }
-
-  &.btn-delete {
-    color: vars.$deleteColor;
-    background: rgba(220, 38, 38, 0.07);
-
-    &:hover {
-      background: rgba(220, 38, 38, 0.14);
-      color: vars.$deleteColor;
-    }
-  }
-
-  &.btn-save {
-    color: vars.$primaryColor;
-    background: rgba(13, 148, 136, 0.07);
-
-    &:hover {
-      background: rgba(13, 148, 136, 0.14);
-      color: vars.$primaryColor;
     }
   }
 
@@ -67,6 +46,7 @@
     cursor: not-allowed;
     background: transparent;
     color: vars.$secondaryTextColor;
+    border-color: vars.$borderStrong;
     transform: none;
     box-shadow: none;
   }

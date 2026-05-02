@@ -8,6 +8,8 @@
 @use "../view/AttributionControl/AttributionControl";
 @use "../view/components/Button/LeafButton";
 @use "../view/components/Canvas/Canvas";
+@use "../view/components/Button/CanvasButton";
+@use "../view/components/Button/CanvasInput";
 
 html, body {
   margin: 0;

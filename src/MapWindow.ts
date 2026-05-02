@@ -9,6 +9,8 @@ import AttributionControlView from "./view/AttributionControl/AttributionControl
 import MapStatusBarModel from "./model/MapStatusBarModel";
 import LeftSidebarModel from "./model/LeftSidebarModel";
 import ObjectStore from "./store/ObjectStore";
+import CanvasView from "./view/components/Canvas/CanvasView";
+import CanvasModel from "./model/CanvasModel";
 
 export default class MapWindow {
     map: L.Map;
@@ -30,9 +32,13 @@ export default class MapWindow {
 
         const objectStore = new ObjectStore(this.map);
 
+        const canvasView = new CanvasView();
+        container.appendChild(canvasView);
+        const canvasModel = new CanvasModel(objectStore, canvasView);
+
         const leftSideBarView = new LeftSidebarView();
         container.appendChild(leftSideBarView);
-        new LeftSidebarModel(objectStore, leftSideBarView, this.map, this.element);
+        new LeftSidebarModel(objectStore, leftSideBarView, this.map, this.element, canvasView, canvasModel);
 
         const mapControlView = new MapControlView();
         container.appendChild(mapControlView);

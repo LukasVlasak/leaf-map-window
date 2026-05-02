@@ -3,6 +3,8 @@ import "leaflet-draw";
 import type ObjectStore from "../store/ObjectStore";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
+import type CanvasView from "../view/components/Canvas/CanvasView";
+import type CanvasModel from "./CanvasModel";
 
 const POLYGON_DRAW_OPTIONS = {
     showLength: false,
@@ -40,6 +42,8 @@ export default class LeftSidebarModel {
     private _leftSidebarView: LeftSidebarView;
     private _map: L.Map;
     private _element: string;
+    private _canvasView: CanvasView;
+    private _canvasModel: CanvasModel;
 
     private _drawers: Drawer[] = [];
 
@@ -48,11 +52,13 @@ export default class LeftSidebarModel {
     private _freedrawLine: L.Polyline | null = null;
     private _freedrawDelay: number = FREEDRAW_DELAY;
 
-    constructor(objectStore: ObjectStore, leftSidebarView: LeftSidebarView, map: L.Map, element: string) {
+    constructor(objectStore: ObjectStore, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasView: CanvasView, canvasModel: CanvasModel) {
         this._objectStore = objectStore;
         this._leftSidebarView = leftSidebarView;
         this._map = map;
         this._element = element;
+        this._canvasView = canvasView;
+        this._canvasModel = canvasModel;
 
         this._initListeners();
         this._initDrawers();
@@ -70,6 +76,8 @@ export default class LeftSidebarModel {
         this._leftSidebarView.onPolygonClick(this._onPolygonClick.bind(this));
         this._leftSidebarView.onPolylineClick(this._onPolylineClick.bind(this));
         this._leftSidebarView.onFreedrawClick(this._onFreedrawClick.bind(this));
+        this._leftSidebarView.onCanvasClick(this._onCanvasClick.bind(this));
+        this._canvasView.onCloseButtonClick(this._onCanvasClick.bind(this));
 
         this._map.on("mousedown", this._mousedownFreedraw.bind(this));
         this._map.on("mousemove", this._mousemoveFreedraw.bind(this));
@@ -99,6 +107,10 @@ export default class LeftSidebarModel {
 
     private _onPolylineClick() {
         this._switchActiveDrawer("polyline");
+    }
+
+    private _onCanvasClick() {
+        this._switchActiveDrawer("canvas");
     }
 
     private _onFreedrawClick(e: MouseEvent) {
@@ -153,6 +165,11 @@ export default class LeftSidebarModel {
             return;
         }
 
+        if (type === "canvas") {
+            this._canvasModel.toggleCanvasVisibility(this._map);
+            return;
+        }
+
         const drawer = this._drawers.find((d) => d.type === type)!.drawer;
         if (drawer.enabled()) {
             drawer.disable();
@@ -169,6 +186,9 @@ export default class LeftSidebarModel {
         if (doNotDisable !== "freedraw") {
             this._freedrawingEnabled = false;
             this._map.dragging.enable();
+        }
+        if (doNotDisable !== "canvas") {
+            this._canvasModel.onCanvasClose();
         }
     }
 }

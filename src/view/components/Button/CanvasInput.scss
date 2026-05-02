@@ -1,0 +1,54 @@
+@use "../../../styles/variables" as vars;
+
+.canvas-input {
+  height: 34px;
+  border-radius: vars.$iconRadius;
+  border: 1px solid vars.$borderStrong;
+  background: transparent;
+  color: vars.$textColor;
+  font-size: 13px;
+  transition: border-color vars.$transition, box-shadow vars.$transition;
+  margin-right: 5px;
+
+  &:hover {
+    border-color: rgba(17, 17, 17, 0.22);
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: vars.$primaryColor;
+    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+    cursor: text;
+  }
+
+  &[type="color"] {
+    width: 34px;
+    padding: 4px;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: calc(#{vars.$iconRadius} - 3px);
+    }
+
+    &::-moz-color-swatch {
+      border: none;
+      border-radius: calc(#{vars.$iconRadius} - 3px);
+    }
+  }
+
+  &[type="number"] {
+    width: 64px;
+    padding: 0 8px;
+    -moz-appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+  }
+}
