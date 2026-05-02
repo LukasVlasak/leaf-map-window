@@ -1,4 +1,4 @@
-export default class CanvasInput extends HTMLInputElement {
+export default class CanvasInputButton extends HTMLInputElement {
     private _tip: string | undefined;
     private _inputType: 'color' | 'number';
 
@@ -19,4 +19,4 @@ export default class CanvasInput extends HTMLInputElement {
     }
 }
 
-customElements.define('canvas-input', CanvasInput, { extends: 'input' });
+customElements.define('canvas-input', CanvasInputButton, { extends: 'input' });

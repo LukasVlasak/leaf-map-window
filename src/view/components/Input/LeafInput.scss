@@ -1,0 +1,22 @@
+@use "../../../styles/variables" as vars;
+
+.leaf-input {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid vars.$borderStrong;
+  border-radius: vars.$iconRadius;
+  font-size: 14px;
+  color: vars.$textColor;
+  background: white;
+  outline: none;
+  transition: border-color vars.$transition, box-shadow vars.$transition;
+
+  &::placeholder {
+    color: vars.$mutedTextColor;
+  }
+
+  &:focus {
+    border-color: vars.$primaryColor;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+  }
+}

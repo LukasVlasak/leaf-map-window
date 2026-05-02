@@ -36,6 +36,14 @@ const DEFAULT_POINT_OPTIONS = {
     id: 'point'
 }
 
+const DEFAULT_TEXT_OPTIONS = {
+    left: 50,
+    top: 50,
+    fill: "#000000",
+    fontSize: 20,
+    id: 'text'
+}
+
 export type DrawType = "circle" | "polygon" | "line" | "polyline" | "point" | "text" | "freedraw";
 
 export default class CanvasModel {
@@ -68,11 +76,14 @@ export default class CanvasModel {
         this._canvasView.onCancelPathClick(this._onCancelPathClicked.bind(this));
         this._canvasView.onSavePathClick(this._onSavePathClicked.bind(this));
 
+        this._canvasView.onSaveTextClick(this._onSaveTextClicked.bind(this));
+
         this._canvasView.onDrawCircleClick(() => {this._switchDrawingType("circle")});
         this._canvasView.onDrawPolygonClick(() => {this._switchDrawingType("polygon")});
         this._canvasView.onDrawLineClick(() => {this._switchDrawingType("line")});
         this._canvasView.onAddPointClick(() => {this._switchDrawingType("point")});
         this._canvasView.onFreeDrawClick(() => {this._switchDrawingType("freedraw")});
+        this._canvasView.onAddTextClick(() => {this._switchDrawingType("text")});
     }
 
     initCanvas() {
@@ -91,6 +102,14 @@ export default class CanvasModel {
                 this._fabricCanvas.isDrawingMode = false;
                 this._onCancelPathClicked();
             }
+
+            if (this._drawingMode === "text") {
+                // text was previous drawing mode -> deactivation of text
+                this._canvasView.getTextInput().clear();
+                this._canvasView.getTextInput().hide();
+                this._canvasView.hideSaveTextBtn();
+            }
+
             this._drawingMode = type;
 
             if (this._drawingMode === "freedraw") {
@@ -98,11 +117,22 @@ export default class CanvasModel {
                 this._fabricCanvas.isDrawingMode = true;
                 this._timeStamp = new Date();
             }
+
+            if (this._drawingMode === "text") {
+                // text is new drawingMode -> activation of text
+                this._canvasView.getTextInput().show();
+                this._canvasView.showSaveTextBtn();
+            }
         }
     }
 
     _deactivateControls() {
         this._canvasView.deactivateControlButtons();
+        if (this._drawingMode === "text") {
+            this._canvasView.getTextInput().hide();
+            this._canvasView.getTextInput().clear();
+            this._canvasView.hideSaveTextBtn();
+        }
         this._drawingMode = undefined;
         if (this._fabricCanvas.isDrawingMode) {
             this._onCancelPathClicked();
@@ -111,7 +141,7 @@ export default class CanvasModel {
     }
 
     _onCanvasMouseDown(event: IEvent<MouseEvent>) {
-        if (!this._drawingMode || this._fabricCanvas.isDrawingMode) return;
+        if (!this._drawingMode || this._fabricCanvas.isDrawingMode || this._drawingMode === "text") return;
 
         const pointer = this._fabricCanvas.getPointer(event.e);
         const startX = pointer.x;
@@ -169,7 +199,7 @@ export default class CanvasModel {
     }
 
     _onCanvasMouseUp() {
-        if (!this._drawingMode || this._fabricCanvas.isDrawingMode) return;
+        if (!this._currDrawObject || this._fabricCanvas.isDrawingMode) return;
 
         this._canvasView.deactivateControlButtons();
         this._drawingMode = undefined;
@@ -199,6 +229,15 @@ export default class CanvasModel {
         this._fabricCanvas.isDrawingMode = false;
         this._canvasView.deactivateControlButtons();
         this._canvasView.hidePathButtons();
+    }
+
+    _onSaveTextClicked() {
+        if (this._canvasView.getTextInput().getValue()) {
+            const value = this._canvasView.getTextInput().getValue();
+            const text = new fabric.Text(value, DEFAULT_TEXT_OPTIONS);
+            this._fabricCanvas.add(text);
+            this._canvasView.getTextInput().clear();
+        }
     }
 
     saveCanvas() {

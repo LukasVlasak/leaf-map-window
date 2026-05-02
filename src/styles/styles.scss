@@ -9,7 +9,8 @@
 @use "../view/components/Button/LeafButton";
 @use "../view/components/Canvas/Canvas";
 @use "../view/components/Button/CanvasButton";
-@use "../view/components/Button/CanvasInput";
+@use "../view/components/Button/CanvasInputButton";
+@use "../view/components/Input/LeafInput";
 
 html, body {
   margin: 0;

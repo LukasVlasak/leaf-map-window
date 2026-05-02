@@ -1,7 +1,8 @@
 import CanvasButton from "../Button/CanvasButton";
-import CanvasInput from "../Button/CanvasInput";
+import CanvasInputButton from "../Button/CanvasInputButton";
 import LeafButton from "../Button/LeafButton";
 import type {DrawType} from "../../../model/CanvasModel";
+import LeafInput from "../Input/LeafInput";
 
 
 export default class CanvasView extends HTMLElement {
@@ -13,13 +14,16 @@ export default class CanvasView extends HTMLElement {
     private _addPoint: CanvasButton | undefined = undefined;
     private _freeDraw: CanvasButton | undefined = undefined;
 
-    private _changeStroke: CanvasInput | undefined = undefined;
-    private _changeColor: CanvasInput | undefined = undefined;
-    private _changeStrokeWidth: CanvasInput | undefined = undefined;
+    private _changeStroke: CanvasInputButton | undefined = undefined;
+    private _changeColor: CanvasInputButton | undefined = undefined;
+    private _changeStrokeWidth: CanvasInputButton | undefined = undefined;
     private _deleteActiveElement: LeafButton | undefined = undefined;
 
     private _savePathButton: CanvasButton | undefined = undefined;
     private _cancelPathButton: CanvasButton | undefined = undefined;
+
+    private _textInput: LeafInput | undefined = undefined;
+    private _saveTextBtn: LeafButton | undefined = undefined;
 
     private _saveButton: LeafButton | undefined = undefined;
 
@@ -60,10 +64,16 @@ export default class CanvasView extends HTMLElement {
         this._addPoint = new CanvasButton('Přidat bod', 'Přidat bod', 'fa fa-map-marker');
         this._freeDraw = new CanvasButton('Volné kreslení', 'Volné kreslení', 'fa fa-pencil');
         this._savePathButton = new LeafButton('Uložit volné kreslení', 'Uložit volné kreslení', 'fa fa-check', false, true);
-        this._cancelPathButton = new LeafButton('Smazat volné kreslení', 'Smazat volné kreslení', 'fa fa-times', true);
+        this._savePathButton.style.marginRight = '5px';
+        this._cancelPathButton = new LeafButton('Smazat aktuálně nakreslené linie', 'Smazat aktuálně nakreslené linie', 'fa fa-times', true);
+        this._textInput = new LeafInput('canvasText', 'Váš text');
+        this._textInput.style.marginRight = '5px';
+        this._saveTextBtn = new LeafButton('Uložit text', 'Uložit text', 'fa fa-check', false, true);
 
         this._savePathButton!.hide();
         this._cancelPathButton!.hide();
+        this._textInput!.hide();
+        this._saveTextBtn!.hide();
 
         btnsSection.appendChild(this._drawCircle);
         btnsSection.appendChild(this._drawPolygon);
@@ -74,12 +84,14 @@ export default class CanvasView extends HTMLElement {
         btnsSection.appendChild(this._freeDraw);
         btnsSection.appendChild(this._savePathButton);
         btnsSection.appendChild(this._cancelPathButton);
+        btnsSection.appendChild(this._textInput);
+        btnsSection.appendChild(this._saveTextBtn);
 
         const editBtnsSection = document.createElement("div");
 
-        this._changeStroke = new CanvasInput('color', 'Změnit barvu ohraničení');
-        this._changeColor = new CanvasInput('color', 'Změnit barvu výplně');
-        this._changeStrokeWidth = new CanvasInput('number', 'Změnit šířku ohraničení');
+        this._changeStroke = new CanvasInputButton('color', 'Změnit barvu ohraničení');
+        this._changeColor = new CanvasInputButton('color', 'Změnit barvu výplně');
+        this._changeStrokeWidth = new CanvasInputButton('number', 'Změnit šířku ohraničení');
         this._deleteActiveElement = new LeafButton('Odstranit aktivní element', 'Odstranit aktivní element', 'fa fa-times', true);
 
         editBtnsSection.appendChild(this._changeStroke);
@@ -265,6 +277,10 @@ export default class CanvasView extends HTMLElement {
         this._cancelPathButton!.addEventListener('click', handler);
     }
 
+    onSaveTextClick(handler: () => void) {
+        this._saveTextBtn!.addEventListener('click', handler);
+    }
+
     showPathButtons() {
         this._cancelPathButton!.show();
         this._savePathButton!.show();
@@ -273,6 +289,18 @@ export default class CanvasView extends HTMLElement {
     hidePathButtons() {
         this._cancelPathButton!.hide();
         this._savePathButton!.hide();
+    }
+
+    getTextInput(): LeafInput {
+        return this._textInput!;
+    }
+
+    hideSaveTextBtn() {
+        this._saveTextBtn!.hide();
+    }
+
+    showSaveTextBtn() {
+        this._saveTextBtn!.show();
     }
 
     show() {
