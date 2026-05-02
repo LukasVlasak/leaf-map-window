@@ -58,6 +58,14 @@ export default class LeafButton extends HTMLButtonElement {
     enable() {
         this.disabled = false;
     }
+
+    hide() {
+        this.style.display = 'none';
+    }
+
+    show() {
+        this.style.display = 'inline-flex';
+    }
 }
 
 customElements.define('leaf-button', LeafButton, { extends: 'button' });

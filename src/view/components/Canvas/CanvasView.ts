@@ -18,6 +18,9 @@ export default class CanvasView extends HTMLElement {
     private _changeStrokeWidth: CanvasInput | undefined = undefined;
     private _deleteActiveElement: LeafButton | undefined = undefined;
 
+    private _savePathButton: CanvasButton | undefined = undefined;
+    private _cancelPathButton: CanvasButton | undefined = undefined;
+
     private _saveButton: LeafButton | undefined = undefined;
 
     private _closeButton: CanvasButton | undefined = undefined;
@@ -56,6 +59,11 @@ export default class CanvasView extends HTMLElement {
         this._addText = new CanvasButton('Přidat text', 'Přidat text', 'fa fa-font');
         this._addPoint = new CanvasButton('Přidat bod', 'Přidat bod', 'fa fa-map-marker');
         this._freeDraw = new CanvasButton('Volné kreslení', 'Volné kreslení', 'fa fa-pencil');
+        this._savePathButton = new LeafButton('Uložit volné kreslení', 'Uložit volné kreslení', 'fa fa-check', false, true);
+        this._cancelPathButton = new LeafButton('Smazat volné kreslení', 'Smazat volné kreslení', 'fa fa-times', true);
+
+        this._savePathButton!.hide();
+        this._cancelPathButton!.hide();
 
         btnsSection.appendChild(this._drawCircle);
         btnsSection.appendChild(this._drawPolygon);
@@ -64,6 +72,8 @@ export default class CanvasView extends HTMLElement {
         btnsSection.appendChild(this._addText);
         btnsSection.appendChild(this._addPoint);
         btnsSection.appendChild(this._freeDraw);
+        btnsSection.appendChild(this._savePathButton);
+        btnsSection.appendChild(this._cancelPathButton);
 
         const editBtnsSection = document.createElement("div");
 
@@ -245,6 +255,24 @@ export default class CanvasView extends HTMLElement {
 
     onSaveButtonClick(handler: () => void) {
         this._saveButton!.addEventListener('click', handler);
+    }
+
+    onSavePathClick(handler: () => void) {
+        this._savePathButton!.addEventListener('click', handler);
+    }
+
+    onCancelPathClick(handler: () => void) {
+        this._cancelPathButton!.addEventListener('click', handler);
+    }
+
+    showPathButtons() {
+        this._cancelPathButton!.show();
+        this._savePathButton!.show();
+    }
+
+    hidePathButtons() {
+        this._cancelPathButton!.hide();
+        this._savePathButton!.hide();
     }
 
     show() {

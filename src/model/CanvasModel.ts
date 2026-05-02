@@ -47,6 +47,9 @@ export default class CanvasModel {
     private _drawingMode: DrawType | undefined = undefined;
     private _currDrawObject: undefined | fabric.Object = undefined;
 
+    // helper for deleting paths
+    private _timeStamp: Date | undefined = undefined;
+
     constructor(objectStore: ObjectStore, canvasView: CanvasView) {
         this._fabricCanvas = new fabric.Canvas('canvas');
 
@@ -60,11 +63,16 @@ export default class CanvasModel {
         this._fabricCanvas.on('mouse:down', this._onCanvasMouseDown.bind(this));
         this._fabricCanvas.on('mouse:move', this._onCanvasMouseMove.bind(this));
         this._fabricCanvas.on('mouse:up', this._onCanvasMouseUp.bind(this));
+        this._fabricCanvas.on('path:created', this._onCanvasPathCreated.bind(this));
+
+        this._canvasView.onCancelPathClick(this._onCancelPathClicked.bind(this));
+        this._canvasView.onSavePathClick(this._onSavePathClicked.bind(this));
 
         this._canvasView.onDrawCircleClick(() => {this._switchDrawingType("circle")});
         this._canvasView.onDrawPolygonClick(() => {this._switchDrawingType("polygon")});
         this._canvasView.onDrawLineClick(() => {this._switchDrawingType("line")});
         this._canvasView.onAddPointClick(() => {this._switchDrawingType("point")});
+        this._canvasView.onFreeDrawClick(() => {this._switchDrawingType("freedraw")});
     }
 
     initCanvas() {
@@ -74,11 +82,36 @@ export default class CanvasModel {
     _switchDrawingType(type: DrawType) {
         this._canvasView.deactivateControlButtons(type);
         this._canvasView.toggleControlButtonState(type);
-        this._drawingMode = type;
+        if (this._drawingMode === type) {
+            // clicked the same btn again - deactivate
+            this._deactivateControls();
+        } else {
+            if (this._drawingMode === "freedraw") {
+                // freedraw was previous drawing mode -> deactivation of freedraw
+                this._fabricCanvas.isDrawingMode = false;
+                this._onCancelPathClicked();
+            }
+            this._drawingMode = type;
+
+            if (this._drawingMode === "freedraw") {
+                // freedraw is new drawingMode -> activation of freedraw
+                this._fabricCanvas.isDrawingMode = true;
+                this._timeStamp = new Date();
+            }
+        }
+    }
+
+    _deactivateControls() {
+        this._canvasView.deactivateControlButtons();
+        this._drawingMode = undefined;
+        if (this._fabricCanvas.isDrawingMode) {
+            this._onCancelPathClicked();
+        }
+        this._fabricCanvas.isDrawingMode = false;
     }
 
     _onCanvasMouseDown(event: IEvent<MouseEvent>) {
-        if (!this._drawingMode) return;
+        if (!this._drawingMode || this._fabricCanvas.isDrawingMode) return;
 
         const pointer = this._fabricCanvas.getPointer(event.e);
         const startX = pointer.x;
@@ -116,7 +149,7 @@ export default class CanvasModel {
     }
 
     _onCanvasMouseMove(event: IEvent<MouseEvent>) {
-        if (this._currDrawObject === undefined) return;
+        if (this._currDrawObject === undefined || this._fabricCanvas.isDrawingMode) return;
 
         const pointer = this._fabricCanvas.getPointer(event.e);
 
@@ -136,11 +169,36 @@ export default class CanvasModel {
     }
 
     _onCanvasMouseUp() {
-        if (!this._drawingMode) return;
+        if (!this._drawingMode || this._fabricCanvas.isDrawingMode) return;
 
         this._canvasView.deactivateControlButtons();
         this._drawingMode = undefined;
         this._currDrawObject = undefined;
+    }
+
+    _onCanvasPathCreated(e: IEvent<MouseEvent>) {
+        // the object e has 'path' but IEvent type doesnt declare it
+        const path = (e as any).path;
+        path.set({id: 'path', timeStamp: this._timeStamp});
+        this._canvasView.showPathButtons();
+    }
+
+    _onCancelPathClicked() {
+        this._fabricCanvas.getObjects().forEach(o => {
+            if (o.get('timeStamp' as any) === this._timeStamp) {
+                this._fabricCanvas.remove(o);
+            }
+        });
+        this._canvasView.hidePathButtons();
+
+        this._fabricCanvas.renderAll();
+    }
+
+    _onSavePathClicked() {
+        this._drawingMode = undefined;
+        this._fabricCanvas.isDrawingMode = false;
+        this._canvasView.deactivateControlButtons();
+        this._canvasView.hidePathButtons();
     }
 
     saveCanvas() {
