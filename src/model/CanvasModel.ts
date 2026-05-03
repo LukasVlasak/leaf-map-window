@@ -143,7 +143,7 @@ export default class CanvasModel {
             this._canvasView.getTextInput().clear();
             this._canvasView.hideSaveTextBtn();
         }
-        this._resetCanvasState();
+        this._updateCanvasState();
         if (this._fabricCanvas.isDrawingMode) {
             this._onCancelPathClicked();
         }
@@ -211,7 +211,7 @@ export default class CanvasModel {
     _onCanvasMouseUp() {
         if (!this._currDrawObject || this._fabricCanvas.isDrawingMode) return;
 
-        this._resetCanvasState();
+        this._updateCanvasState();
         this._currDrawObject = undefined;
     }
 
@@ -296,7 +296,24 @@ export default class CanvasModel {
         this._fabricCanvas.renderAll();
     }
 
-    _resetCanvasState() {
+    _hardResetCanvasState() {
+        this._fabricCanvas.remove(...this._fabricCanvas.getObjects());
+
+        this._updateSaveBtnState();
+        this._canvasView.deactivateControlButtons();
+        this._enableCanvasSelection();
+        this._drawingMode = undefined;
+        this._currDrawObject = undefined;
+
+        this._fabricCanvas.isDrawingMode = false;
+        this._canvasView.hidePathButtons();
+
+        this._canvasView.getTextInput().hide();
+        this._canvasView.getTextInput().clear();
+        this._canvasView.hideSaveTextBtn();
+    }
+
+    _updateCanvasState() {
         this._updateSaveBtnState();
         this._canvasView.deactivateControlButtons();
         this._enableCanvasSelection();
@@ -304,7 +321,7 @@ export default class CanvasModel {
     }
 
     _onSavePathClicked() {
-        this._resetCanvasState();
+        this._updateCanvasState();
         this._fabricCanvas.isDrawingMode = false;
         this._canvasView.hidePathButtons();
     }
@@ -362,6 +379,7 @@ export default class CanvasModel {
 
     onCanvasClose() {
         this._canvasView.hide();
+        this._hardResetCanvasState();
     }
 
     _updateSaveBtnState() {
