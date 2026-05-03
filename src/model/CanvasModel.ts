@@ -100,54 +100,50 @@ export default class CanvasModel {
     }
 
     _switchDrawingType(type: DrawType) {
+        const previousMode = this._drawingMode;
         this._canvasView.deactivateControlButtons(type);
         this._canvasView.toggleControlButtonState(type);
-        if (this._drawingMode === type) {
-            // clicked the same btn again - deactivate
-            this._deactivateControls();
-        } else {
-            this._disableCanvasSelection();
 
-            if (this._drawingMode === "freedraw") {
-                // freedraw was previous drawing mode -> deactivation of freedraw
-                this._fabricCanvas.isDrawingMode = false;
-                this._onCancelPathClicked();
-            }
+        if (previousMode === 'freedraw') this._onCancelPathClicked();
 
-            if (this._drawingMode === "text") {
-                // text was previous drawing mode -> deactivation of text
-                this._canvasView.getTextInput().clear();
-                this._canvasView.getTextInput().hide();
-                this._canvasView.hideSaveTextBtn();
-            }
+        if (previousMode === type) {
+            this._exitDrawingMode();
+            return;
+        }
 
-            this._drawingMode = type;
+        this._cleanupCurrentMode();
+        this._disableCanvasSelection();
+        this._drawingMode = type;
 
-            if (this._drawingMode === "freedraw") {
-                // freedraw is new drawingMode -> activation of freedraw
-                this._fabricCanvas.isDrawingMode = true;
-                this._timeStamp = new Date();
-            }
-
-            if (this._drawingMode === "text") {
-                // text is new drawingMode -> activation of text
-                this._canvasView.getTextInput().show();
-                this._canvasView.showSaveTextBtn();
-            }
+        if (type === 'freedraw') {
+            this._fabricCanvas.isDrawingMode = true;
+            this._timeStamp = new Date();
+        }
+        if (type === 'text') {
+            this._canvasView.getTextInput().show();
+            this._canvasView.showSaveTextBtn();
         }
     }
 
-    _deactivateControls() {
-        if (this._drawingMode === "text") {
+    _cleanupCurrentMode() {
+        if (this._drawingMode === 'freedraw') {
+            this._fabricCanvas.isDrawingMode = false;
+            this._canvasView.hidePathButtons();
+        }
+        if (this._drawingMode === 'text') {
             this._canvasView.getTextInput().hide();
             this._canvasView.getTextInput().clear();
             this._canvasView.hideSaveTextBtn();
         }
-        this._updateCanvasState();
-        if (this._fabricCanvas.isDrawingMode) {
-            this._onCancelPathClicked();
-        }
-        this._fabricCanvas.isDrawingMode = false;
+        this._drawingMode = undefined;
+        this._currDrawObject = undefined;
+    }
+
+    _exitDrawingMode() {
+        this._cleanupCurrentMode();
+        this._enableCanvasSelection();
+        this._canvasView.deactivateControlButtons();
+        this._updateSaveBtnState();
     }
 
     _onCanvasMouseDown(event: IEvent<MouseEvent>) {
@@ -211,8 +207,7 @@ export default class CanvasModel {
     _onCanvasMouseUp() {
         if (!this._currDrawObject || this._fabricCanvas.isDrawingMode) return;
 
-        this._updateCanvasState();
-        this._currDrawObject = undefined;
+        this._exitDrawingMode();
     }
 
     _onCanvasPathCreated(e: IEvent<MouseEvent>) {
@@ -220,6 +215,21 @@ export default class CanvasModel {
         const path = (e as any).path;
         path.set({id: 'path', timeStamp: this._timeStamp});
         this._canvasView.showPathButtons();
+    }
+
+    _onCancelPathClicked() {
+        this._fabricCanvas.getObjects().forEach(o => {
+            if (o.get('timeStamp' as any) === this._timeStamp) {
+                this._fabricCanvas.remove(o);
+            }
+        });
+        this._canvasView.hidePathButtons();
+
+        this._fabricCanvas.renderAll();
+    }
+
+    _onSavePathClicked() {
+        this._exitDrawingMode();
     }
 
     _onCanvasSelectionUpdated() {
@@ -285,45 +295,9 @@ export default class CanvasModel {
         }
     }
 
-    _onCancelPathClicked() {
-        this._fabricCanvas.getObjects().forEach(o => {
-            if (o.get('timeStamp' as any) === this._timeStamp) {
-                this._fabricCanvas.remove(o);
-            }
-        });
-        this._canvasView.hidePathButtons();
-
-        this._fabricCanvas.renderAll();
-    }
-
-    _hardResetCanvasState() {
+    _resetCanvas() {
         this._fabricCanvas.remove(...this._fabricCanvas.getObjects());
-
-        this._updateSaveBtnState();
-        this._canvasView.deactivateControlButtons();
-        this._enableCanvasSelection();
-        this._drawingMode = undefined;
-        this._currDrawObject = undefined;
-
-        this._fabricCanvas.isDrawingMode = false;
-        this._canvasView.hidePathButtons();
-
-        this._canvasView.getTextInput().hide();
-        this._canvasView.getTextInput().clear();
-        this._canvasView.hideSaveTextBtn();
-    }
-
-    _updateCanvasState() {
-        this._updateSaveBtnState();
-        this._canvasView.deactivateControlButtons();
-        this._enableCanvasSelection();
-        this._drawingMode = undefined;
-    }
-
-    _onSavePathClicked() {
-        this._updateCanvasState();
-        this._fabricCanvas.isDrawingMode = false;
-        this._canvasView.hidePathButtons();
+        this._exitDrawingMode();
     }
 
     _onSaveTextClicked() {
@@ -379,7 +353,7 @@ export default class CanvasModel {
 
     onCanvasClose() {
         this._canvasView.hide();
-        this._hardResetCanvasState();
+        this._resetCanvas();
     }
 
     _updateSaveBtnState() {
