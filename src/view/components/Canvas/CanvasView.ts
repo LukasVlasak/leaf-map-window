@@ -318,6 +318,14 @@ export default class CanvasView extends HTMLElement {
         this._saveButton!.enable();
     }
 
+    disableDeleteActiveElBtn() {
+        this._deleteActiveElement!.disable();
+    }
+
+    enableDeleteActiveElBtn() {
+        this._deleteActiveElement!.enable();
+    }
+
     getChangeStrokeInput() {
         return this._changeStroke!;
     }

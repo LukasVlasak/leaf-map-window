@@ -85,6 +85,8 @@ export default class CanvasModel {
 
         this._canvasView.onSaveTextClick(this._onSaveTextClicked.bind(this));
 
+        this._canvasView.onDeleteActiveElementClick(this._onDeleteActiveElement.bind(this));
+
         this._canvasView.onDrawCircleClick(() => {this._switchDrawingType("circle")});
         this._canvasView.onDrawPolygonClick(() => {this._switchDrawingType("polygon")});
         this._canvasView.onDrawLineClick(() => {this._switchDrawingType("line")});
@@ -95,10 +97,6 @@ export default class CanvasModel {
         this._canvasView.onChangeColor((e) => this._editObjProp("fill", e));
         this._canvasView.onChangeStroke((e) => this._editObjProp("stroke", e));
         this._canvasView.onChangeStrokeWidth((e) => this._editObjProp("strokeWidth", e));
-    }
-
-    initCanvas() {
-
     }
 
     _switchDrawingType(type: DrawType) {
@@ -230,6 +228,7 @@ export default class CanvasModel {
         // allow to select just 1 object
         if (activeObjs.length === 1) {
             const activeObj = activeObjs[0]!;
+            this._canvasView.enableDeleteActiveElBtn();
 
             if (activeObj.get('id' as any) === 'text') {
                 this._canvasView.getChangeStrokeWidhtInput().enable();
@@ -264,6 +263,7 @@ export default class CanvasModel {
         this._canvasView.getChangeColorInput().disable();
         this._canvasView.getChangeStrokeInput().disable();
         this._canvasView.getChangeStrokeWidhtInput().disable();
+        this._canvasView.disableDeleteActiveElBtn();
     }
 
     _editObjProp(prop: "fill" | "stroke" | "strokeWidth", e: Event) {
@@ -317,6 +317,12 @@ export default class CanvasModel {
             this._canvasView.getTextInput().clear();
             this._updateSaveBtnState();
         }
+    }
+
+    _onDeleteActiveElement() {
+        // activeObject cannot be null bcs btn would be disabled if so
+        this._fabricCanvas.remove(this._fabricCanvas.getActiveObject()!);
+        this._updateSaveBtnState();
     }
 
     _disableCanvasSelection() {
