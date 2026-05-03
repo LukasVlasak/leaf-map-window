@@ -92,6 +92,7 @@ export default class CanvasView extends HTMLElement {
         this._changeStroke = new CanvasInputButton('color', 'Změnit barvu ohraničení');
         this._changeColor = new CanvasInputButton('color', 'Změnit barvu výplně');
         this._changeStrokeWidth = new CanvasInputButton('number', 'Změnit šířku ohraničení');
+        this._changeStrokeWidth.min = "1";
         this._deleteActiveElement = new LeafButton('Odstranit aktivní element', 'Odstranit aktivní element', 'fa fa-times', true);
 
         this._changeStroke.disable();
@@ -260,15 +261,15 @@ export default class CanvasView extends HTMLElement {
     }
 
     onChangeStroke(handler: (e: Event) => void) {
-        this._changeStroke!.addEventListener('change', handler);
+        this._changeStroke!.addEventListener('input', handler);
     }
 
     onChangeColor(handler: (e: Event) => void) {
-        this._changeColor!.addEventListener('change', handler);
+        this._changeColor!.addEventListener('input', handler);
     }
 
     onChangeStrokeWidth(handler: (e: Event) => void) {
-        this._changeStrokeWidth!.addEventListener('change', handler);
+        this._changeStrokeWidth!.addEventListener('input', handler);
     }
 
     onSaveButtonClick(handler: () => void) {

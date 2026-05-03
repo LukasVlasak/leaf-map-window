@@ -108,6 +108,8 @@ export default class CanvasModel {
             // clicked the same btn again - deactivate
             this._deactivateControls();
         } else {
+            this._disableCanvasSelection();
+
             if (this._drawingMode === "freedraw") {
                 // freedraw was previous drawing mode -> deactivation of freedraw
                 this._fabricCanvas.isDrawingMode = false;
@@ -138,13 +140,12 @@ export default class CanvasModel {
     }
 
     _deactivateControls() {
-        this._canvasView.deactivateControlButtons();
         if (this._drawingMode === "text") {
             this._canvasView.getTextInput().hide();
             this._canvasView.getTextInput().clear();
             this._canvasView.hideSaveTextBtn();
         }
-        this._drawingMode = undefined;
+        this._resetCanvasState();
         if (this._fabricCanvas.isDrawingMode) {
             this._onCancelPathClicked();
         }
@@ -212,9 +213,7 @@ export default class CanvasModel {
     _onCanvasMouseUp() {
         if (!this._currDrawObject || this._fabricCanvas.isDrawingMode) return;
 
-        this._updateSaveBtnState();
-        this._canvasView.deactivateControlButtons();
-        this._drawingMode = undefined;
+        this._resetCanvasState();
         this._currDrawObject = undefined;
     }
 
@@ -232,10 +231,11 @@ export default class CanvasModel {
         if (activeObjs.length === 1) {
             const activeObj = activeObjs[0]!;
 
-            if (activeObj.get("id" as any) === "text") {
+            if (activeObj.get('id' as any) === 'text') {
                 this._canvasView.getChangeStrokeWidhtInput().enable();
                 this._canvasView.getChangeStrokeWidhtInput().setValue(activeObj.get("fontSize" as any));
-            } else if (activeObj.get('strokeWidth')) {
+            // point has to have strokeWidth otherwise not rendered, however changing strokeWidth is not applicable
+            } else if (activeObj.get('strokeWidth') && activeObj.get('id' as any) !== 'point') {
                 this._canvasView.getChangeStrokeWidhtInput().enable();
                 this._canvasView.getChangeStrokeWidhtInput().setValue(activeObj.get("strokeWidth" as any));
             } else {
@@ -272,7 +272,15 @@ export default class CanvasModel {
         // @ts-ignore
         const value = e.currentTarget.value;
         if (value) {
-            activeObj.set({[prop]: value});
+            // text needs font size instead of strokeWidth
+            if (activeObj.get('id' as any) === 'text' && prop === "strokeWidth") {
+                // @ts-ignore
+                activeObj.set({'fontSize': parseInt(value)});
+            } else if (prop === "strokeWidth") {
+                activeObj.set({strokeWidth: parseInt(value)});
+            } else {
+                activeObj.set({[prop]: value});
+            }
             this._fabricCanvas.renderAll();
         }
     }
@@ -288,12 +296,17 @@ export default class CanvasModel {
         this._fabricCanvas.renderAll();
     }
 
-    _onSavePathClicked() {
-        this._drawingMode = undefined;
-        this._fabricCanvas.isDrawingMode = false;
-        this._canvasView.deactivateControlButtons();
-        this._canvasView.hidePathButtons();
+    _resetCanvasState() {
         this._updateSaveBtnState();
+        this._canvasView.deactivateControlButtons();
+        this._enableCanvasSelection();
+        this._drawingMode = undefined;
+    }
+
+    _onSavePathClicked() {
+        this._resetCanvasState();
+        this._fabricCanvas.isDrawingMode = false;
+        this._canvasView.hidePathButtons();
     }
 
     _onSaveTextClicked() {
@@ -304,6 +317,21 @@ export default class CanvasModel {
             this._canvasView.getTextInput().clear();
             this._updateSaveBtnState();
         }
+    }
+
+    _disableCanvasSelection() {
+        this._fabricCanvas.discardActiveObject();
+        this._fabricCanvas.forEachObject((o) => {
+            o.selectable = false;
+        });
+        this._fabricCanvas.renderAll();
+    }
+
+    _enableCanvasSelection() {
+        this._fabricCanvas.forEachObject((o) => {
+            o.selectable = true;
+        });
+        this._fabricCanvas.renderAll();
     }
 
     saveCanvas() {
