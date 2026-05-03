@@ -145,8 +145,17 @@ export default class CanvasView extends HTMLElement {
         let startTop = 0;
 
         const onMouseMove = (e: MouseEvent) => {
-            this.style.left = startLeft + (e.clientX - startX) + 'px';
-            this.style.top = startTop + (e.clientY - startY) + 'px';
+            const left = startLeft + (e.clientX - startX);
+
+            // 10 for some padding
+            if (left >= 10 && left + parseInt(this.style.width) < window.innerWidth - 10) {
+                this.style.left = left + 'px';   
+            }
+
+            const top = startTop + (e.clientY - startY);
+            if (top >= 10 && top + parseInt(this.style.height) < window.innerHeight - 10) {
+                this.style.top = top + 'px';
+            }
         };
 
         const onMouseUp = () => {
