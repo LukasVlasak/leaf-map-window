@@ -24,6 +24,8 @@ const DEFAULT_POLYGON_OPTIONS = {
 
 const DEFAULT_LINE_OPTIONS = {
     stroke: '#000',
+    // have to specify otherwise obj.get('fill') is not falsy
+    fill: undefined,
     strokeWidth: 3,
     id: 'line'
 }
@@ -71,7 +73,12 @@ export default class CanvasModel {
         this._fabricCanvas.on('mouse:down', this._onCanvasMouseDown.bind(this));
         this._fabricCanvas.on('mouse:move', this._onCanvasMouseMove.bind(this));
         this._fabricCanvas.on('mouse:up', this._onCanvasMouseUp.bind(this));
+
         this._fabricCanvas.on('path:created', this._onCanvasPathCreated.bind(this));
+
+        this._fabricCanvas.on('selection:created', this._onCanvasSelectionUpdated.bind(this));
+        this._fabricCanvas.on('selection:updated', this._onCanvasSelectionUpdated.bind(this));
+        this._fabricCanvas.on('selection:cleared', this._onCanvasSelectionCleared.bind(this));
 
         this._canvasView.onCancelPathClick(this._onCancelPathClicked.bind(this));
         this._canvasView.onSavePathClick(this._onSavePathClicked.bind(this));
@@ -84,6 +91,10 @@ export default class CanvasModel {
         this._canvasView.onAddPointClick(() => {this._switchDrawingType("point")});
         this._canvasView.onFreeDrawClick(() => {this._switchDrawingType("freedraw")});
         this._canvasView.onAddTextClick(() => {this._switchDrawingType("text")});
+
+        this._canvasView.onChangeColor((e) => this._editObjProp("fill", e));
+        this._canvasView.onChangeStroke((e) => this._editObjProp("stroke", e));
+        this._canvasView.onChangeStrokeWidth((e) => this._editObjProp("strokeWidth", e));
     }
 
     initCanvas() {
@@ -201,6 +212,7 @@ export default class CanvasModel {
     _onCanvasMouseUp() {
         if (!this._currDrawObject || this._fabricCanvas.isDrawingMode) return;
 
+        this._updateSaveBtnState();
         this._canvasView.deactivateControlButtons();
         this._drawingMode = undefined;
         this._currDrawObject = undefined;
@@ -211,6 +223,58 @@ export default class CanvasModel {
         const path = (e as any).path;
         path.set({id: 'path', timeStamp: this._timeStamp});
         this._canvasView.showPathButtons();
+    }
+
+    _onCanvasSelectionUpdated() {
+        const activeObjs = this._fabricCanvas.getActiveObjects();
+
+        // allow to select just 1 object
+        if (activeObjs.length === 1) {
+            const activeObj = activeObjs[0]!;
+
+            if (activeObj.get("id" as any) === "text") {
+                this._canvasView.getChangeStrokeWidhtInput().enable();
+                this._canvasView.getChangeStrokeWidhtInput().setValue(activeObj.get("fontSize" as any));
+            } else if (activeObj.get('strokeWidth')) {
+                this._canvasView.getChangeStrokeWidhtInput().enable();
+                this._canvasView.getChangeStrokeWidhtInput().setValue(activeObj.get("strokeWidth" as any));
+            } else {
+                this._canvasView.getChangeStrokeWidhtInput().disable();
+            }
+
+            if (activeObj.get('stroke')) {
+                this._canvasView.getChangeStrokeInput().enable();
+                this._canvasView.getChangeStrokeInput().setValue(activeObj.get('stroke')!);
+            } else {
+                this._canvasView.getChangeStrokeInput().disable();
+            }
+
+            if (activeObj.get('fill')) {
+                this._canvasView.getChangeColorInput().enable();
+                this._canvasView.getChangeColorInput().setValue(activeObj.get('fill') as any);
+            } else {
+                this._canvasView.getChangeColorInput().disable();
+            }
+        } else {
+            this._onCanvasSelectionCleared();
+        }
+    }
+
+    _onCanvasSelectionCleared() {
+        this._canvasView.getChangeColorInput().disable();
+        this._canvasView.getChangeStrokeInput().disable();
+        this._canvasView.getChangeStrokeWidhtInput().disable();
+    }
+
+    _editObjProp(prop: "fill" | "stroke" | "strokeWidth", e: Event) {
+        // input is either disabled or ONE obj that supports this edit is selected
+        const activeObj = this._fabricCanvas.getActiveObject()!;
+        // @ts-ignore
+        const value = e.currentTarget.value;
+        if (value) {
+            activeObj.set({[prop]: value});
+            this._fabricCanvas.renderAll();
+        }
     }
 
     _onCancelPathClicked() {
@@ -229,6 +293,7 @@ export default class CanvasModel {
         this._fabricCanvas.isDrawingMode = false;
         this._canvasView.deactivateControlButtons();
         this._canvasView.hidePathButtons();
+        this._updateSaveBtnState();
     }
 
     _onSaveTextClicked() {
@@ -237,6 +302,7 @@ export default class CanvasModel {
             const text = new fabric.Text(value, DEFAULT_TEXT_OPTIONS);
             this._fabricCanvas.add(text);
             this._canvasView.getTextInput().clear();
+            this._updateSaveBtnState();
         }
     }
 
@@ -262,5 +328,13 @@ export default class CanvasModel {
 
     onCanvasClose() {
         this._canvasView.hide();
+    }
+
+    _updateSaveBtnState() {
+        if (this._fabricCanvas.getObjects().length > 0) {
+            this._canvasView.enableSaveBtn();
+        } else {
+            this._canvasView.disableSaveBtn();
+        }
     }
 }

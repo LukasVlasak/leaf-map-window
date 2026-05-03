@@ -22,6 +22,12 @@
     cursor: text;
   }
 
+  &:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    background: vars.$bgSurfaceMuted;
+  }
+
   &[type="color"] {
     width: 34px;
     padding: 4px;

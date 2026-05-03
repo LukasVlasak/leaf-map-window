@@ -94,6 +94,11 @@ export default class CanvasView extends HTMLElement {
         this._changeStrokeWidth = new CanvasInputButton('number', 'Změnit šířku ohraničení');
         this._deleteActiveElement = new LeafButton('Odstranit aktivní element', 'Odstranit aktivní element', 'fa fa-times', true);
 
+        this._changeStroke.disable();
+        this._changeColor.disable();
+        this._changeStrokeWidth.disable();
+        this._deleteActiveElement.disable();
+
         editBtnsSection.appendChild(this._changeStroke);
         editBtnsSection.appendChild(this._changeColor);
         editBtnsSection.appendChild(this._changeStrokeWidth);
@@ -126,6 +131,7 @@ export default class CanvasView extends HTMLElement {
         footer.className = 'canvas-footer';
 
         this._saveButton = new LeafButton('Uložit plátno', 'Uložit plátno', undefined, false, true, 'Uložit');
+        this._saveButton.disable();
         footer.appendChild(this._saveButton);
 
         this.appendChild(footer);
@@ -253,15 +259,15 @@ export default class CanvasView extends HTMLElement {
         this._deleteActiveElement!.addEventListener('click', handler);
     }
 
-    onChangeStroke(handler: () => void) {
+    onChangeStroke(handler: (e: Event) => void) {
         this._changeStroke!.addEventListener('change', handler);
     }
 
-    onChangeColor(handler: () => void) {
+    onChangeColor(handler: (e: Event) => void) {
         this._changeColor!.addEventListener('change', handler);
     }
 
-    onChangeStrokeWidth(handler: () => void) {
+    onChangeStrokeWidth(handler: (e: Event) => void) {
         this._changeStrokeWidth!.addEventListener('change', handler);
     }
 
@@ -301,6 +307,26 @@ export default class CanvasView extends HTMLElement {
 
     showSaveTextBtn() {
         this._saveTextBtn!.show();
+    }
+
+    disableSaveBtn() {
+        this._saveButton!.disable();
+    }
+
+    enableSaveBtn() {
+        this._saveButton!.enable();
+    }
+
+    getChangeStrokeInput() {
+        return this._changeStroke!;
+    }
+
+    getChangeColorInput() {
+        return this._changeColor!;
+    }
+
+    getChangeStrokeWidhtInput() {
+        return this._changeStrokeWidth!;
     }
 
     show() {

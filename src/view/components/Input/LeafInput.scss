@@ -19,4 +19,10 @@
     border-color: vars.$primaryColor;
     box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
   }
+
+  &:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    background: vars.$bgSurfaceMuted;
+  }
 }

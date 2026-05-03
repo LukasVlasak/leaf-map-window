@@ -17,6 +17,22 @@ export default class CanvasInputButton extends HTMLInputElement {
             this.title = this._tip;
         }
     }
+
+    getValue() {
+        return this.value;
+    }
+
+    setValue(value: string) {
+        this.value = value;
+    }
+
+    disable() {
+        this.disabled = true;
+    }
+
+    enable() {
+        this.disabled = false;
+    }
 }
 
 customElements.define('canvas-input', CanvasInputButton, { extends: 'input' });
