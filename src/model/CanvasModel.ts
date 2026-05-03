@@ -2,6 +2,7 @@ import type ObjectStore from "../store/ObjectStore";
 import {fabric} from "fabric";
 import type CanvasView from "../view/components/Canvas/CanvasView";
 import type {IEvent} from "fabric/fabric-impl";
+import L, {type LatLngBoundsExpression} from "leaflet";
 
 const DEFAULT_CIRCLE_OPTIONS = {
     radius: 1,
@@ -74,6 +75,7 @@ export default class CanvasModel {
 
     private _objectStore: ObjectStore;
     private _canvasView: CanvasView;
+    private _map: L.Map;
 
     private _drawingMode: DrawType | undefined = undefined;
     private _currDrawObject: undefined | fabric.Object = undefined;
@@ -86,11 +88,12 @@ export default class CanvasModel {
     private _polyLineTempLine: fabric.Line | undefined = undefined;
     private _polyLinePointMarkers: fabric.Rect[] = [];
 
-    constructor(objectStore: ObjectStore, canvasView: CanvasView) {
+    constructor(objectStore: ObjectStore, canvasView: CanvasView, map: L.Map) {
         this._fabricCanvas = new fabric.Canvas('canvas');
 
         this._objectStore = objectStore;
         this._canvasView = canvasView;
+        this._map = map;
 
         this.initListeners();
     }
@@ -124,6 +127,14 @@ export default class CanvasModel {
         this._canvasView.onChangeColor((e) => this._editObjProp("fill", e));
         this._canvasView.onChangeStroke((e) => this._editObjProp("stroke", e));
         this._canvasView.onChangeStrokeWidth((e) => this._editObjProp("strokeWidth", e));
+    }
+
+    bindOnCanvasSaveButton(handler: () => void) {
+        this._canvasView.onSaveButtonClick(handler);
+    }
+
+    bindOnCanvasCloseButton(handler: () => void) {
+        this._canvasView.onCloseButtonClick(handler);
     }
 
     _switchDrawingType(type: DrawType) {
@@ -426,8 +437,40 @@ export default class CanvasModel {
         this._fabricCanvas.renderAll();
     }
 
-    saveCanvas() {
+    onCanvasSave() {
+        const url = this._fabricCanvas.toDataURL({ format: 'png' });
 
+        const coordinates = this._getCanvasCoordinates();
+        const img = new L.ImageOverlay(url, coordinates, {
+            alt:  'Uložené canvas plátno',
+            className: 'canvas-img'
+        });
+        this._objectStore.addObject(img);
+    }
+
+    _getCanvasCoordinates(): LatLngBoundsExpression {
+        const overlayRect = this._canvasView.getHTMLCanvas().getBoundingClientRect();
+        const mapRect = this._map.getContainer().getBoundingClientRect();
+
+        const overlayLeft = overlayRect.left - mapRect.left;
+        const overlayTop = overlayRect.top - mapRect.top;
+        const overlayRight = overlayLeft + overlayRect.width;
+        const overlayBottom = overlayTop + overlayRect.height;
+
+        const topLeft = this._map.containerPointToLatLng([overlayLeft, overlayTop]);
+        const topRight = this._map.containerPointToLatLng([overlayRight, overlayTop]);
+        const bottomLeft = this._map.containerPointToLatLng([overlayLeft, overlayBottom]);
+        const bottomRight = this._map.containerPointToLatLng([overlayRight, overlayBottom]);
+
+        return new L.LatLngBounds(
+            [
+                [topLeft.lat, topLeft.lng],
+                [topRight.lat, topRight.lng],
+                [bottomRight.lat, bottomRight.lng],
+                [bottomLeft.lat, bottomLeft.lng],
+                [topLeft.lat, topLeft.lng]
+            ]
+        );
     }
 
     toggleCanvasVisibility(map: L.Map) {

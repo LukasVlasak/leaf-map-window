@@ -3,7 +3,6 @@ import "leaflet-draw";
 import type ObjectStore from "../store/ObjectStore";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
-import type CanvasView from "../view/components/Canvas/CanvasView";
 import type CanvasModel from "./CanvasModel";
 
 const POLYGON_DRAW_OPTIONS = {
@@ -42,7 +41,6 @@ export default class LeftSidebarModel {
     private _leftSidebarView: LeftSidebarView;
     private _map: L.Map;
     private _element: string;
-    private _canvasView: CanvasView;
     private _canvasModel: CanvasModel;
 
     private _drawers: Drawer[] = [];
@@ -52,12 +50,11 @@ export default class LeftSidebarModel {
     private _freedrawLine: L.Polyline | null = null;
     private _freedrawDelay: number = FREEDRAW_DELAY;
 
-    constructor(objectStore: ObjectStore, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasView: CanvasView, canvasModel: CanvasModel) {
+    constructor(objectStore: ObjectStore, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel) {
         this._objectStore = objectStore;
         this._leftSidebarView = leftSidebarView;
         this._map = map;
         this._element = element;
-        this._canvasView = canvasView;
         this._canvasModel = canvasModel;
 
         this._initListeners();
@@ -77,7 +74,9 @@ export default class LeftSidebarModel {
         this._leftSidebarView.onPolylineClick(this._onPolylineClick.bind(this));
         this._leftSidebarView.onFreedrawClick(this._onFreedrawClick.bind(this));
         this._leftSidebarView.onCanvasClick(this._onCanvasClick.bind(this));
-        this._canvasView.onCloseButtonClick(this._onCanvasClick.bind(this));
+
+        this._canvasModel.bindOnCanvasSaveButton(this._onCanvasSave.bind(this));
+        this._canvasModel.bindOnCanvasCloseButton(this._onCanvasClose.bind(this));
 
         this._map.on("mousedown", this._mousedownFreedraw.bind(this));
         this._map.on("mousemove", this._mousemoveFreedraw.bind(this));
@@ -99,6 +98,17 @@ export default class LeftSidebarModel {
 
         this._leftSidebarView.toggleToolBtnState(caller);
         this._toggleDrawer(caller);
+    }
+
+    private _onCanvasSave() {
+        this._canvasModel.onCanvasSave();
+        this._disableDrawers();
+        this._leftSidebarView.deactivateToolBtns();
+    }
+
+    private _onCanvasClose() {
+        this._disableDrawers();
+        this._leftSidebarView.deactivateToolBtns();
     }
 
     private _onPolygonClick() {

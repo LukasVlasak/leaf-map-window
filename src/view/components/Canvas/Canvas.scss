@@ -1,3 +1,8 @@
+// already displayed image
+.canvas-img {
+  border: 1px solid black;
+}
+
 .canvas-container {
   position: absolute;
   z-index: 1001; // above all content

@@ -29,6 +29,8 @@ export default class CanvasView extends HTMLElement {
 
     private _closeButton: CanvasButton | undefined = undefined;
 
+    private _htmlCanvas: HTMLCanvasElement | undefined = undefined;
+
     constructor() {
         super();
     }
@@ -116,14 +118,14 @@ export default class CanvasView extends HTMLElement {
         const leftSidebar = document.createElement("div");
         leftSidebar.className = 'sidebar';
 
-        const canvas = document.createElement('canvas');
-        canvas.id = 'canvas';
+        this._htmlCanvas = document.createElement('canvas');
+        this._htmlCanvas.id = 'canvas';
 
         const rightSidebar = document.createElement("div");
         rightSidebar.className = 'sidebar';
 
         canvasSection.appendChild(leftSidebar);
-        canvasSection.appendChild(canvas);
+        canvasSection.appendChild(this._htmlCanvas);
         canvasSection.appendChild(rightSidebar);
 
         this.appendChild(canvasSection);
@@ -345,6 +347,10 @@ export default class CanvasView extends HTMLElement {
 
     getChangeStrokeWidhtInput() {
         return this._changeStrokeWidth!;
+    }
+
+    getHTMLCanvas() {
+        return this._htmlCanvas!;
     }
 
     show() {
