@@ -30,6 +30,27 @@ const DEFAULT_LINE_OPTIONS = {
     id: 'line'
 }
 
+const DEFAULT_POLYLINE_OPTIONS = {
+    stroke: '#000',
+    fill: undefined,
+    strokeWidth: 3,
+    objectCaching: false,
+    selectable: false,
+    id: 'polyline'
+}
+
+const DEFAULT_POLYLINE_MARKER_OPTIONS = {
+    width: 10,
+    height: 10,
+    fill: '#000',
+    stroke: '#000',
+    originX: 'center',
+    originY: 'center',
+    hoverCursor: 'pointer',
+    selectable: false,
+    id: 'polylinePoint'
+}
+
 const DEFAULT_POINT_OPTIONS = {
     radius: 5,
     fill: '#000',
@@ -59,6 +80,11 @@ export default class CanvasModel {
 
     // helper for deleting paths
     private _timeStamp: Date | undefined = undefined;
+
+    private _polyLinePoints: {x: number, y: number}[] = [];
+    private _polyline: fabric.Polyline | undefined = undefined;
+    private _polyLineTempLine: fabric.Line | undefined = undefined;
+    private _polyLinePointMarkers: fabric.Rect[] = [];
 
     constructor(objectStore: ObjectStore, canvasView: CanvasView) {
         this._fabricCanvas = new fabric.Canvas('canvas');
@@ -93,6 +119,7 @@ export default class CanvasModel {
         this._canvasView.onAddPointClick(() => {this._switchDrawingType("point")});
         this._canvasView.onFreeDrawClick(() => {this._switchDrawingType("freedraw")});
         this._canvasView.onAddTextClick(() => {this._switchDrawingType("text")});
+        this._canvasView.onDrawPolylineClick(() => {this._switchDrawingType("polyline")});
 
         this._canvasView.onChangeColor((e) => this._editObjProp("fill", e));
         this._canvasView.onChangeStroke((e) => this._editObjProp("stroke", e));
@@ -134,6 +161,15 @@ export default class CanvasModel {
             this._canvasView.getTextInput().hide();
             this._canvasView.getTextInput().clear();
             this._canvasView.hideSaveTextBtn();
+        }
+        if (this._drawingMode === 'polyline') {
+            this._polyLinePointMarkers.forEach(m => this._fabricCanvas.remove(m));
+            this._polyLinePointMarkers = [];
+            if (this._polyLineTempLine) this._fabricCanvas.remove(this._polyLineTempLine);
+            this._polyLineTempLine = undefined;
+            if (this._polyline) this._fabricCanvas.remove(this._polyline);
+            this._polyline = undefined;
+            this._polyLinePoints = [];
         }
         this._drawingMode = undefined;
         this._currDrawObject = undefined;
@@ -178,6 +214,9 @@ export default class CanvasModel {
                     top: startY
                 });
                 break;
+            case "polyline":
+                this._handlePolyline(event, startX, startY);
+                return;
         }
 
         this._fabricCanvas.add(this._currDrawObject!);
@@ -185,9 +224,17 @@ export default class CanvasModel {
     }
 
     _onCanvasMouseMove(event: IEvent<MouseEvent>) {
-        if (this._currDrawObject === undefined || this._fabricCanvas.isDrawingMode) return;
+        if (this._fabricCanvas.isDrawingMode) return;
 
         const pointer = this._fabricCanvas.getPointer(event.e);
+
+        if (this._drawingMode === 'polyline' && this._polyLineTempLine) {
+            this._polyLineTempLine.set({ x2: pointer.x, y2: pointer.y });
+            this._fabricCanvas.renderAll();
+            return;
+        }
+
+        if (this._currDrawObject === undefined) return;
 
         if (this._currDrawObject instanceof fabric.Circle) {
             const radius = Math.sqrt(Math.pow(pointer.x - this._currDrawObject.left!, 2) + Math.pow(pointer.y - this._currDrawObject.top!, 2)) / 2;
@@ -206,6 +253,54 @@ export default class CanvasModel {
 
     _onCanvasMouseUp() {
         if (!this._currDrawObject || this._fabricCanvas.isDrawingMode) return;
+
+        this._exitDrawingMode();
+    }
+
+    _handlePolyline(event: IEvent<MouseEvent>, startX: number, startY: number) {
+        if (this._polyLinePointMarkers.length > 1 && event.target === this._polyLinePointMarkers.at(-1)) {
+            this._clearAndSavePolyline();
+            return;
+        }
+
+        if (event.target && (event.target as any).get('id') === 'polylinePoint') return;
+
+        const marker = new fabric.Rect({ left: startX, top: startY, ...DEFAULT_POLYLINE_MARKER_OPTIONS });
+        this._polyLinePointMarkers.push(marker);
+        this._fabricCanvas.add(marker);
+        this._polyLinePoints.push({ x: startX, y: startY });
+
+        if (!this._polyline) {
+            this._polyline = new fabric.Polyline(this._polyLinePoints, DEFAULT_POLYLINE_OPTIONS);
+            this._polyLineTempLine = new fabric.Line([startX, startY, startX, startY], {
+                stroke: DEFAULT_POLYLINE_OPTIONS.stroke,
+                strokeWidth: DEFAULT_POLYLINE_OPTIONS.strokeWidth,
+                strokeDashArray: [5, 5],
+                selectable: false,
+            });
+            this._fabricCanvas.add(this._polyLineTempLine);
+            this._fabricCanvas.add(this._polyline);
+        } else {
+            (this._polyline as any).points = this._polyLinePoints;
+            // set start of dashed line - visible while mouse move
+            this._polyLineTempLine!.set({ x1: startX, y1: startY });
+        }
+
+        this._fabricCanvas.renderAll();
+    }
+
+    _clearAndSavePolyline() {
+        this._polyLinePointMarkers.forEach(m => this._fabricCanvas.remove(m));
+        this._polyLinePointMarkers = [];
+        this._fabricCanvas.remove(this._polyLineTempLine!);
+        this._polyLineTempLine = undefined;
+
+        // fix bounding
+        (this._polyline as any)._setPositionDimensions({});
+        this._polyline!.setCoords();
+
+        this._polyline = undefined;
+        this._polyLinePoints = [];
 
         this._exitDrawingMode();
     }
