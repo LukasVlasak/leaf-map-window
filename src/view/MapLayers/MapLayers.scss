@@ -17,8 +17,11 @@
   box-shadow: vars.$primaryPanelBoxShadow;
 
   &.collapsed {
-    .panel-body { display: none; }
-    .panel-collapse svg { transform: rotate(180deg); }
+    .panel-body {
+      max-height: 0;
+      overflow: hidden;
+    }
+    .panel-head .arrow { transform: rotate(180deg); }
   }
 
   .panel-head {
@@ -27,6 +30,12 @@
     justify-content: space-between;
     padding: 14px 16px 10px;
     border-bottom: 1px solid vars.$borderStrong;
+    cursor: pointer;
+    transition: background vars.$transition;
+
+    &:hover {
+      background: vars.$bgSurfaceMuted;
+    }
 
     .panel-title {
       font-size: 11px;
@@ -36,20 +45,14 @@
       font-weight: 600;
     }
 
-    .panel-collapse {
+    .arrow {
       width: 28px;
       height: 28px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 6px;
       color: vars.$mutedTextColor;
-      transition: background vars.$transition, color vars.$transition;
-
-      &:hover {
-        background: vars.$bgSurfaceMuted;
-        color: vars.$textColor;
-      }
+      transition: transform vars.$transitionFast;
     }
   }
 
@@ -73,9 +76,9 @@
       &:hover { color: vars.$textColor; }
 
       &.active {
-        background: white;
-        color: vars.$textColor;
-        box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04);
+        background: vars.$primaryColor;
+        color: white;
+        box-shadow: vars.$primaryIconBoxShadow;
       }
     }
   }
@@ -84,6 +87,8 @@
     overflow-y: auto;
     flex: 1;
     min-height: 0;
+    max-height: 500px;
+    transition: max-height vars.$transitionFast;
 
     .panel-section-head {
       display: flex;
