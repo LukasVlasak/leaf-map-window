@@ -123,8 +123,15 @@ export default class MapLayersView extends HTMLElement {
         objectDiv.addEventListener('click', () => this._onObjectClickHandler!(obj));
 
         const objDot = document.createElement("div");
-        objDot.className = 'obj-dot';
-        objDot.style.background = obj.color || 'white';
+        if (obj.type === "canvas") {
+            objDot.className = 'obj-dot-icon';
+            const icon = document.createElement('i');
+            icon.className = 'fa fa-object-group';
+            objDot.appendChild(icon);
+        } else {
+            objDot.className = 'obj-dot';
+            objDot.style.background = obj.color || 'white';
+        }
 
         const objInfo = document.createElement("div");
         objInfo.className = 'obj-info';

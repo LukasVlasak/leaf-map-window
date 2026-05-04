@@ -50,7 +50,7 @@ export default class MapLayersModel {
                 object.layer.setStyle({ color: SELECTED_OBJECT_COLOR, fillColor: SELECTED_OBJECT_COLOR });
                 break;
             case "canvas":
-                (object.layer.getElement() as HTMLImageElement).style.border = '1px solid ' + SELECTED_OBJECT_COLOR;
+                (object.layer.getElement() as HTMLImageElement).style.border = '2px solid ' + SELECTED_OBJECT_COLOR;
                 break;
         }
     }

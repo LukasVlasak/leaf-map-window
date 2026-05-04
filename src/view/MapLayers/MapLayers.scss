@@ -294,6 +294,17 @@
         flex-shrink: 0;
       }
 
+      .obj-dot-icon {
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: vars.$mutedTextColor;
+        font-size: 14px;
+      }
+
       .obj-info {
         flex: 1;
         min-width: 0;
