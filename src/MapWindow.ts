@@ -33,9 +33,9 @@ export default class MapWindow {
 
         const mapLayersView = new MapLayersView();
         container.appendChild(mapLayersView);
-        new MapLayersModel(mapLayersView, this.map);
 
         const objectStore = new ObjectStore(this.map, mapLayersView);
+        new MapLayersModel(mapLayersView, this.map, objectStore);
 
         const canvasView = new CanvasView();
         document.body.appendChild(canvasView);

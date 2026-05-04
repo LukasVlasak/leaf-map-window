@@ -166,6 +166,10 @@ export default class MapLayersView extends HTMLElement {
         this._onObjectRemoveClickHandler = handler;
     }
 
+    onMapLayersTabClick(handler: () => void) {
+        this._layersTabBtn!.addEventListener('click', handler);
+    }
+
     _setObjectListToEmpty() {
         this._objectList!.innerHTML = `
             <div class="empty">
