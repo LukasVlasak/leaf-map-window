@@ -50,7 +50,7 @@ export default class MapLayersModel {
                 object.layer.setStyle({ color: SELECTED_OBJECT_COLOR, fillColor: SELECTED_OBJECT_COLOR });
                 break;
             case "canvas":
-                (object.layer.getElement() as HTMLImageElement).style.border = '2px solid ' + SELECTED_OBJECT_COLOR;
+                (object.layer.getElement() as HTMLImageElement).style.outline = '2px solid ' + SELECTED_OBJECT_COLOR;
                 break;
         }
     }
@@ -62,7 +62,7 @@ export default class MapLayersModel {
                 object.layer.setStyle({ color: object.color, fillColor: object.color });
                 break;
             case "canvas":
-                (object.layer.getElement() as HTMLImageElement).style.border = '';
+                (object.layer.getElement() as HTMLImageElement).style.outline = '';
                 break;
         }
     }

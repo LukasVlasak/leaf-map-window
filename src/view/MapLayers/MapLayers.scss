@@ -278,6 +278,10 @@
         background: vars.$lightPrimaryColor;
         border-left: 2px solid vars.$primaryColor;
         padding-left: 12px;
+
+        &:hover {
+          background: vars.$lightPrimaryColor !important;
+        }
       }
 
       &:hover {
@@ -320,6 +324,150 @@
         .obj-meta {
           font-size: 11px;
           color: vars.$mutedTextColor;
+        }
+      }
+    }
+
+    .obj-editor {
+      border-top: 1px solid vars.$borderLight;
+      background: vars.$bgSurfaceMuted;
+      padding: 14px 16px 16px;
+
+      .field {
+        margin-bottom: 20px;
+
+        .field-label {
+          display: block;
+          font-size: 10px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: vars.$mutedTextColor;
+          font-weight: 600;
+          margin-bottom: 6px;
+        }
+
+        .field-textarea {
+          resize: vertical;
+        }
+
+        .field-input, .field-textarea {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 8px 10px;
+          font-size: 13px;
+          font-family: inherit;
+          color: black;
+          background: white;
+          border: 1px solid vars.$borderStrong;
+          border-radius: vars.$iconRadius;
+          outline: none;
+          transition: border-color vars.$transitionFast, box-shadow vars.$transitionFast;
+
+            &:focus {
+              border-color: vars.$primaryColor;
+              box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+            }
+        }
+
+        .colors {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+
+          .color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+            transition: transform vars.$transitionFast, border-color vars.$transitionFast;
+
+            &.selected {
+              border-color: black;
+              transform: scale(1.08);
+            }
+          }
+        }
+
+        .field-range-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .slider {
+            appearance: none;
+            flex: 1;
+            height: 4px;
+            background: black;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+          }
+
+          .slider-val {
+            font-size: 11px;
+            color: black;
+            min-width: 36px;
+            text-align: right;
+          }
+        }
+
+        .toggle-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+
+          .toggle {
+            width: 36px;
+            height: 20px;
+            background: vars.$borderStrong;
+            border-radius: 999px;
+            position: relative;
+            transition: background vars.$transitionFast;
+            flex-shrink: 0;
+            padding: 0;
+            cursor: pointer;
+
+            &.on {
+              background: vars.$primaryColor;
+
+              .thumb {
+                transform: translateX(16px);
+              }
+            }
+
+            .thumb {
+              position: absolute;
+              top: 2px;
+              left: 2px;
+              width: 16px;
+              height: 16px;
+              background: #fff;
+              border-radius: 50%;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+              transition: transform vars.$transition;
+            }
+          }
+
+          .toggle-text {
+            flex: 1;
+            min-width: 0;
+
+            .toggle-label-text {
+              font-size: 13px;
+              font-weight: 500;
+              color: black;
+            }
+
+            .toggle-hint {
+              font-size: 11.5px;
+              color: vars.$mutedTextColor;
+              margin-top: 2px;
+              line-height: 1.35;
+            }
+          }
         }
       }
     }
