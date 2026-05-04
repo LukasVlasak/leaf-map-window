@@ -143,6 +143,7 @@ export default class MapLayersView extends HTMLElement {
         const delButton = new LeafButton('', '', 'fa fa-trash', true);
         delButton.addEventListener('click', (e) => {
             e.stopPropagation();
+            objectDiv.remove();
             this._objectListItemsCount--;
             this._updateObjectHeaderContent();
             if (this._objectListItemsCount === 0) {

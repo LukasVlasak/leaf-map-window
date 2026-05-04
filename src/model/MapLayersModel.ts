@@ -20,7 +20,7 @@ export default class MapLayersModel {
 
     _initListeners() {
         this._mapLayersView.onObjectClick(this._onObjectClick.bind(this));
-        this._mapLayersView.onObjectRemoveClick(this._onObjectRemoveClick.bind(this));
+        this._mapLayersView.onObjectRemoveClick(this._objectStore.removeObject.bind(this._objectStore));
         this._mapLayersView.onMapLayersTabClick(this._onMapLayersTabClick.bind(this));
     }
 
@@ -65,9 +65,5 @@ export default class MapLayersModel {
                 (object.layer.getElement() as HTMLImageElement).style.border = '';
                 break;
         }
-    }
-
-    private _onObjectRemoveClick(object: MapObject) {
-
     }
 }
