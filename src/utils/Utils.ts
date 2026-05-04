@@ -22,4 +22,18 @@ export default class Utils {
             return { meters: niceMeters, label: niceMeters + ' m' };
         }
     }
+
+    static formatDistance(meters: number) {
+        if (meters >= 1000) {
+            return (meters / 1000).toFixed(2) + ' km';
+        }
+        return Math.round(meters) + ' m';
+    }
+
+    static formatArea(area: number) {
+        if (area >= 1000000) {
+            return (area / 1000000).toFixed(2) + ' km²';
+        }
+        return Math.round(area).toLocaleString('cs-CZ') + ' m²';
+    }
 }

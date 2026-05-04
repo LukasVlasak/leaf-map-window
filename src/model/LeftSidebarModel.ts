@@ -4,6 +4,7 @@ import type ObjectStore from "../store/ObjectStore";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
+import Utils from "../utils/Utils";
 
 const POLYGON_DRAW_OPTIONS = {
     showLength: false,
@@ -85,13 +86,14 @@ export default class LeftSidebarModel {
         this._map.on(L.Draw.Event.CREATED, (e) => {
             const event = e as L.DrawEvents.Created;
             this._objectStore.addObject(event.layer);
+            this._showMeasurement(event.layer as L.Polyline | L.Polygon, event.layerType);
 
             this._disableDrawers();
             this._leftSidebarView.deactivateToolBtns();
         });
     }
 
-    _switchActiveDrawer(caller: "polygon" | "polyline" | "freedraw" | "measure" | "canvas") {
+    _switchActiveDrawer(caller: "polygon" | "polyline" | "freedraw" | "canvas") {
         // reset state of btns and drawers
         this._disableDrawers(caller);
         this._leftSidebarView.deactivateToolBtns(caller);
@@ -158,12 +160,13 @@ export default class LeftSidebarModel {
         e.originalEvent.preventDefault();
         this._isDrawing = false;
         this._freedrawLine!.addLatLng(e.latlng);
+        this._showMeasurement(this._freedrawLine!, "polyline");
 
         this._disableDrawers();
         this._leftSidebarView.deactivateToolBtns();
     }
 
-    private _toggleDrawer(type: "polygon" | "polyline" | "freedraw" | "measure" | "canvas") {
+    private _toggleDrawer(type: "polygon" | "polyline" | "freedraw" | "canvas") {
         if (type === "freedraw") {
             if (this._freedrawingEnabled) {
                 this._freedrawingEnabled = false;
@@ -188,7 +191,7 @@ export default class LeftSidebarModel {
         }
     }
 
-    private _disableDrawers(doNotDisable?: "polygon" | "polyline" | "freedraw" | "measure" | "canvas") {
+    private _disableDrawers(doNotDisable?: "polygon" | "polyline" | "freedraw" | "canvas") {
         for (const drawerObj of this._drawers) {
             if (doNotDisable && doNotDisable === drawerObj.type) continue;
             drawerObj.drawer.disable();
@@ -200,5 +203,32 @@ export default class LeftSidebarModel {
         if (doNotDisable !== "canvas") {
             this._canvasModel.onCanvasClose();
         }
+    }
+
+    private _calcPolylineDistance(coordinates: L.LatLng[]): number {
+        let distance = 0;
+        for (let i = 0; i < coordinates.length - 1; i++) {
+            distance += coordinates[i]!.distanceTo(coordinates[i + 1]!);
+        }
+        return distance;
+    }
+
+    private _showMeasurement(layer: L.Polyline | L.Polygon, layerType?: string) {
+        let content: string;
+
+        if (layerType === "polygon") {
+            const outerRing = (layer.getLatLngs() as L.LatLng[][])[0]!;
+            const area = L.GeometryUtil.geodesicArea(
+                outerRing.map(l => ({ lat: l.lat, lng: l.lng }))
+            );
+            const circuit = this._calcPolylineDistance([...outerRing, outerRing[0]!]);
+            content = `<b>Obsah:</b> ${Utils.formatArea(area)}<br><b>Obvod:</b> ${Utils.formatDistance(circuit)}`;
+        } else {
+            const latlngs = layer.getLatLngs() as L.LatLng[];
+            const distance = this._calcPolylineDistance(latlngs);
+            content = `<b>Délka:</b> ${Utils.formatDistance(distance)}`;
+        }
+
+        layer.bindPopup(content).openPopup();
     }
 }

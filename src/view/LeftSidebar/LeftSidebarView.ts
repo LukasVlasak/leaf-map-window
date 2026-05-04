@@ -5,7 +5,6 @@ export default class LeftSidebarView extends HTMLElement {
     private _lineBtn: LeafButton | undefined = undefined;
     private _freedrawBtn: LeafButton | undefined = undefined;
     private _canvasBtn: LeafButton | undefined = undefined;
-    private _measureBtn: LeafButton | undefined = undefined;
     private _importBtn: LeafButton | undefined = undefined;
     private _exportBtn: LeafButton | undefined = undefined;
 
@@ -36,21 +35,12 @@ export default class LeftSidebarView extends HTMLElement {
         const secondGroup = document.createElement('div');
         secondGroup.className = 'tool-group';
 
-        this._measureBtn = new LeafButton('Měření vzdálenosti', 'Měření', 'fa fa-ruler');
-
-        secondGroup.appendChild(this._measureBtn);
-        this.appendChild(secondGroup);
-
-
-        const thirdGroup = document.createElement('div');
-        thirdGroup.className = 'tool-group';
-
         this._importBtn = new LeafButton('Import dat (GeoJSON, KML…)', 'Import', 'fa fa-download');
         this._exportBtn = new LeafButton('Export objektů', 'Export', 'fa fa-upload');
 
-        thirdGroup.appendChild(this._importBtn);
-        thirdGroup.appendChild(this._exportBtn);
-        this.appendChild(thirdGroup);
+        secondGroup.appendChild(this._importBtn);
+        secondGroup.appendChild(this._exportBtn);
+        this.appendChild(secondGroup);
     }
 
     onPolygonClick(handler: () => void) {
@@ -65,9 +55,6 @@ export default class LeftSidebarView extends HTMLElement {
     onCanvasClick(handler: () => void) {
         this._canvasBtn!.addEventListener('click', handler);
     }
-    onMeasureClick(handler: () => void) {
-        this._measureBtn!.addEventListener('click', handler);
-    }
     onImportClick(handler: () => void) {
         this._importBtn!.addEventListener('click', handler);
     }
@@ -75,7 +62,7 @@ export default class LeftSidebarView extends HTMLElement {
         this._exportBtn!.addEventListener('click', handler);
     }
 
-    toggleToolBtnState(type: "polygon" | "polyline" | "freedraw" | "measure" | "canvas") {
+    toggleToolBtnState(type: "polygon" | "polyline" | "freedraw" | "canvas") {
         switch (type) {
             case "polygon":
                 this._polygonBtn!.toggleActive();
@@ -86,16 +73,13 @@ export default class LeftSidebarView extends HTMLElement {
             case "freedraw":
                 this._freedrawBtn!.toggleActive();
                 break;
-            case "measure":
-                this._measureBtn!.toggleActive();
-                break;
             case "canvas":
                 this._canvasBtn!.toggleActive();
                 break;
         }
     }
 
-    deactivateToolBtns(doNotDeactivate?: "polygon" | "polyline" | "freedraw" | "measure" | "canvas") {
+    deactivateToolBtns(doNotDeactivate?: "polygon" | "polyline" | "freedraw" | "canvas") {
         if (doNotDeactivate !== "polygon") {
             this._polygonBtn!.deactive();
         }
@@ -107,9 +91,6 @@ export default class LeftSidebarView extends HTMLElement {
         }
         if (doNotDeactivate !== "canvas") {
             this._canvasBtn!.deactive();
-        }
-        if (doNotDeactivate !== "measure") {
-            this._measureBtn!.deactive();
         }
     }
 }
