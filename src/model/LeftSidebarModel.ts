@@ -5,6 +5,7 @@ import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
 import Utils from "../utils/Utils";
+import MapObject from "./MapObject";
 
 const POLYGON_DRAW_OPTIONS = {
     showLength: false,
@@ -85,8 +86,18 @@ export default class LeftSidebarModel {
 
         this._map.on(L.Draw.Event.CREATED, (e) => {
             const event = e as L.DrawEvents.Created;
-            this._objectStore.addObject(event.layer);
-            this._showMeasurement(event.layer as L.Polyline | L.Polygon, event.layerType);
+            const layer = event.layer as L.Polyline | L.Polygon;
+            const type = event.layerType as "polygon" | "polyline";
+
+            let coordinates;
+            if (type === "polygon") {
+                coordinates = layer.getLatLngs() as L.LatLng[][];
+            } else {
+                coordinates = layer.getLatLngs() as L.LatLng[];
+            }
+
+            this._objectStore.addObject(new MapObject(coordinates, layer, type));
+            this._showMeasurement(layer, type);
 
             this._disableDrawers();
             this._leftSidebarView.deactivateToolBtns();
@@ -137,7 +148,7 @@ export default class LeftSidebarModel {
         e.originalEvent.preventDefault();
         this._isDrawing = true;
         this._freedrawLine = polyline([e.latlng], FREEDRAW_OPTIONS);
-        this._objectStore.addObject(this._freedrawLine);
+        this._objectStore.addObject(new MapObject([e.latlng], this._freedrawLine, "polyline"));
     }
 
     private _mousemoveFreedraw(e: LeafletMouseEvent) {

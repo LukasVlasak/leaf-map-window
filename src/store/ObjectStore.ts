@@ -1,17 +1,21 @@
-import {featureGroup, Layer} from "leaflet";
+import {featureGroup} from "leaflet";
+import type MapObject from "../model/MapObject";
 
 export default class ObjectStore {
-    private storeDrawObjects = featureGroup([]);
+    private _mapObjects: MapObject[] = [];
+    private _mapObjectLayer = featureGroup([]);
 
     constructor(map: L.Map) {
-        map.addLayer(this.storeDrawObjects);
+        map.addLayer(this._mapObjectLayer);
     }
 
-    addObject(obj: Layer) {
-        this.storeDrawObjects.addLayer(obj);
+    addObject(obj: MapObject) {
+        this._mapObjects.push(obj);
+        this._mapObjectLayer.addLayer(obj.layer);
     }
 
-    removeObject(obj: Layer) {
-        this.storeDrawObjects.removeLayer(obj);
+    removeObject(obj: MapObject) {
+        this._mapObjects = this._mapObjects.filter((o) => o !== obj);
+        this._mapObjectLayer.removeLayer(obj.layer);
     }
 }

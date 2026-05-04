@@ -3,6 +3,7 @@ import {fabric} from "fabric";
 import type CanvasView from "../view/components/Canvas/CanvasView";
 import type {IEvent} from "fabric/fabric-impl";
 import L, {type LatLngBoundsExpression} from "leaflet";
+import MapObject from "./MapObject";
 
 const DEFAULT_CIRCLE_OPTIONS = {
     radius: 1,
@@ -445,7 +446,7 @@ export default class CanvasModel {
             alt:  'Uložené canvas plátno',
             className: 'canvas-img'
         });
-        this._objectStore.addObject(img);
+        this._objectStore.addObject(new MapObject(coordinates, img, "canvas"));
     }
 
     _getCanvasCoordinates(): LatLngBoundsExpression {
