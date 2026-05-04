@@ -96,7 +96,8 @@ export default class LeftSidebarModel {
                 coordinates = layer.getLatLngs() as L.LatLng[];
             }
 
-            this._objectStore.addObject(new MapObject(coordinates, layer, type));
+            const options = layer.options as L.PathOptions;
+            this._objectStore.addObject(new MapObject(coordinates, layer, type, options.opacity, undefined, undefined, options.color, options.weight));
             this._showMeasurement(layer, type);
 
             this._disableDrawers();
@@ -148,7 +149,8 @@ export default class LeftSidebarModel {
         e.originalEvent.preventDefault();
         this._isDrawing = true;
         this._freedrawLine = polyline([e.latlng], FREEDRAW_OPTIONS);
-        this._objectStore.addObject(new MapObject([e.latlng], this._freedrawLine, "polyline"));
+        const options = this._freedrawLine.options as L.PathOptions;
+        this._objectStore.addObject(new MapObject([e.latlng], this._freedrawLine, "polyline", options.opacity, undefined, undefined, options.color, options.weight));
     }
 
     private _mousemoveFreedraw(e: LeafletMouseEvent) {

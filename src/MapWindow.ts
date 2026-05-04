@@ -11,6 +11,7 @@ import LeftSidebarModel from "./model/LeftSidebarModel";
 import ObjectStore from "./store/ObjectStore";
 import CanvasView from "./view/components/Canvas/CanvasView";
 import CanvasModel from "./model/CanvasModel";
+import MapLayersModel from "./model/MapLayersModel";
 
 export default class MapWindow {
     map: L.Map;
@@ -30,7 +31,11 @@ export default class MapWindow {
     private initView(): void {
         const container = this.map.getContainer();
 
-        const objectStore = new ObjectStore(this.map);
+        const mapLayersView = new MapLayersView();
+        container.appendChild(mapLayersView);
+        new MapLayersModel(mapLayersView, this.map);
+
+        const objectStore = new ObjectStore(this.map, mapLayersView);
 
         const canvasView = new CanvasView();
         document.body.appendChild(canvasView);
@@ -44,7 +49,6 @@ export default class MapWindow {
         container.appendChild(mapControlView);
         new MapControlModel(mapControlView, this.map);
 
-        container.appendChild(new MapLayersView());
         container.appendChild(new SearchBarView());
 
         const mapStatusBarView = new MapStatusBarView();
