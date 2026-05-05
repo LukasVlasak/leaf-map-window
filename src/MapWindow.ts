@@ -34,16 +34,16 @@ export default class MapWindow {
         const mapLayersView = new MapLayersView();
         container.appendChild(mapLayersView);
 
-        const objectStore = new ObjectStore(this.map, mapLayersView);
-        new MapLayersModel(mapLayersView, this.map, objectStore);
+        const objectStore = new ObjectStore(this.map);
+        const mapLayersModel = new MapLayersModel(mapLayersView, this.map, objectStore);
 
         const canvasView = new CanvasView();
         document.body.appendChild(canvasView);
-        const canvasModel = new CanvasModel(objectStore, canvasView, this.map);
+        const canvasModel = new CanvasModel(mapLayersModel, canvasView, this.map);
 
         const leftSideBarView = new LeftSidebarView();
         container.appendChild(leftSideBarView);
-        new LeftSidebarModel(objectStore, leftSideBarView, this.map, this.element, canvasModel);
+        new LeftSidebarModel(mapLayersModel, leftSideBarView, this.map, this.element, canvasModel);
 
         const mapControlView = new MapControlView();
         container.appendChild(mapControlView);

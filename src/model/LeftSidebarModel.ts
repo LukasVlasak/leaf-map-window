@@ -1,11 +1,11 @@
 import * as L from "leaflet";
 import "leaflet-draw";
-import type ObjectStore from "../store/ObjectStore";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
 import MapObject from "./MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapLayers/MapLayersView";
+import type MapLayersModel from "./MapLayersModel";
 
 const POLYGON_DRAW_OPTIONS = {
     selectable: false,
@@ -43,7 +43,7 @@ interface Drawer {
 }
 
 export default class LeftSidebarModel {
-    private _objectStore: ObjectStore;
+    private _mapLayersModel: MapLayersModel;
     private _leftSidebarView: LeftSidebarView;
     private _map: L.Map;
     private _element: string;
@@ -56,8 +56,8 @@ export default class LeftSidebarModel {
     private _freedrawLine: L.Polyline | null = null;
     private _freedrawDelay: number = FREEDRAW_DELAY;
 
-    constructor(objectStore: ObjectStore, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel) {
-        this._objectStore = objectStore;
+    constructor(mapLayersModel: MapLayersModel, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel) {
+        this._mapLayersModel = mapLayersModel;
         this._leftSidebarView = leftSidebarView;
         this._map = map;
         this._element = element;
@@ -101,7 +101,7 @@ export default class LeftSidebarModel {
             }
 
             const options = layer.options as L.PathOptions;
-            this._objectStore.addObject(new MapObject(coordinates, layer, type, options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
+            this._mapLayersModel.addObject(new MapObject(coordinates, layer, type, options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
 
             this._disableDrawers();
             this._leftSidebarView.deactivateToolBtns();
@@ -179,7 +179,7 @@ export default class LeftSidebarModel {
 
         const line = this._freedrawLine!;
         const options = line.options as L.PathOptions;
-        this._objectStore.addObject(new MapObject(line.getLatLngs() as L.LatLng[], line, "polyline", options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
+        this._mapLayersModel.addObject(new MapObject(line.getLatLngs() as L.LatLng[], line, "polyline", options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
         setTimeout(() => { if (line.getPopup()) line.openPopup(); }, 0);
 
         this._disableDrawers();

@@ -1,25 +1,17 @@
 import {featureGroup} from "leaflet";
 import type MapObject from "../model/MapObject";
-import type MapLayersView from "../view/MapLayers/MapLayersView";
 
 export default class ObjectStore {
     private _mapObjects: MapObject[] = [];
     private _mapObjectLayer = featureGroup([]);
 
-    private _mapLayersView: MapLayersView;
-
-    constructor(map: L.Map, mapLayersView: MapLayersView) {
+    constructor(map: L.Map) {
         map.addLayer(this._mapObjectLayer);
-        this._mapLayersView = mapLayersView;
     }
 
     addObject(obj: MapObject) {
         this._mapObjects.push(obj);
         this._mapObjectLayer.addLayer(obj.layer);
-        if (obj.popup) {
-            obj.layer.openPopup();
-        }
-        this._mapLayersView.addObject(obj);
     }
 
     removeObject(obj: MapObject) {
@@ -29,8 +21,6 @@ export default class ObjectStore {
 
     removeAll() {
         this._mapObjects = [];
-        this._mapObjectLayer.eachLayer((layer) => {
-           layer.remove();
-        });
+        this._mapObjectLayer.clearLayers();
     }
 }

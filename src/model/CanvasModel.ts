@@ -1,10 +1,10 @@
-import type ObjectStore from "../store/ObjectStore";
 import {fabric} from "fabric";
 import type CanvasView from "../view/components/Canvas/CanvasView";
 import type {IEvent} from "fabric/fabric-impl";
 import L, {type LatLngBoundsExpression} from "leaflet";
 import MapObject from "./MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapLayers/MapLayersView";
+import type MapLayersModel from "./MapLayersModel";
 
 const DEFAULT_CIRCLE_OPTIONS = {
     radius: 1,
@@ -75,7 +75,7 @@ export type DrawType = "circle" | "polygon" | "line" | "polyline" | "point" | "t
 export default class CanvasModel {
     private _fabricCanvas;
 
-    private _objectStore: ObjectStore;
+    private _mapLayersModel: MapLayersModel;
     private _canvasView: CanvasView;
     private _map: L.Map;
 
@@ -90,10 +90,10 @@ export default class CanvasModel {
     private _polyLineTempLine: fabric.Line | undefined = undefined;
     private _polyLinePointMarkers: fabric.Rect[] = [];
 
-    constructor(objectStore: ObjectStore, canvasView: CanvasView, map: L.Map) {
+    constructor(mapLayersModel: MapLayersModel, canvasView: CanvasView, map: L.Map) {
         this._fabricCanvas = new fabric.Canvas('canvas');
 
-        this._objectStore = objectStore;
+        this._mapLayersModel = mapLayersModel;
         this._canvasView = canvasView;
         this._map = map;
 
@@ -450,7 +450,7 @@ export default class CanvasModel {
             interactive: true,
         });
         const canvasObj = new MapObject(coordinates, img, "canvas", img.options.opacity! * 100, undefined, undefined, DEFAULT_EDIT_COLORS[5], 1);
-        this._objectStore.addObject(canvasObj);
+        this._mapLayersModel.addObject(canvasObj);
     }
 
     _getCanvasCoordinates(): LatLngBoundsExpression {

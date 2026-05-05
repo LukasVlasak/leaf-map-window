@@ -15,6 +15,11 @@ export const DEFAULT_EDIT_COLORS = [
     '#1d4ed8'
 ];
 
+interface ObjectDivs {
+    objectDiv: HTMLDivElement;
+    objectEditDiv: HTMLDivElement;
+}
+
 export default class MapLayersView extends HTMLElement {
     private _objectListEmptyDiv: HTMLDivElement | undefined = undefined;
 
@@ -25,9 +30,10 @@ export default class MapLayersView extends HTMLElement {
     private _overlayLayerList: HTMLDivElement | undefined = undefined;
     private _objectList: HTMLDivElement | undefined = undefined;
 
-    private _onObjectClickHandler: ((obj: MapObject) => void) | undefined = undefined;
-    private _onObjectRemoveClickHandler: ((obj: MapObject) => void) | undefined = undefined;
-    private _onObjectRemoveAllClickHandler: (() => void) | undefined = undefined;
+    private _onObjectSelected: ((obj: MapObject) => void) | undefined = undefined;
+    private _onObjectRemoved: ((obj: MapObject) => void) | undefined = undefined;
+    private _onAllObjectsRemoved: (() => void) | undefined = undefined;
+    private _onObjectDeselect: (() => void) | undefined = undefined;
 
     private _objectListItemsCount: number = 0;
 
@@ -134,10 +140,7 @@ export default class MapLayersView extends HTMLElement {
         this._delAllDiv.className = 'del-all';
         const deleteAll = new LeafButton('', 'Smazat vše', undefined, true, false, 'Smazat vše');
         this._delAllDiv.style.display = 'none';
-        deleteAll.addEventListener('click', (e) => {
-            this._handleRemoveAllObjs(e);
-            this._onObjectRemoveAllClickHandler!();
-        });
+        deleteAll.addEventListener('click', () => this._onAllObjectsRemoved!());
         this._delAllDiv.appendChild(deleteAll);
         this._hideDelAllDiv();
 
@@ -154,21 +157,20 @@ export default class MapLayersView extends HTMLElement {
         this._initListeners(layersPanel, objectsPanel);
     }
 
-    addObject(obj: MapObject) {
+    handleObjectAdded(obj: MapObject) {
         this._hideObjectListEmptyDiv();
         this._showDelAllDiv();
         this._objectListItemsCount++;
         this._updateObjectHeaderContent();
 
         const objectDiv = document.createElement("div");
+        objectDiv.dataset.objectId = obj.ID;
         const objectEditDiv = document.createElement("div");
+        objectEditDiv.dataset.objectEditId = obj.ID;
         objectEditDiv.style.display = 'none';
 
         objectDiv.className = 'obj';
-        objectDiv.addEventListener('click', () => {
-            this._handleObjSelected(objectDiv, objectEditDiv);
-            this._onObjectClickHandler!(obj);
-        });
+        objectDiv.addEventListener('click', () => this._onObjectSelected!(obj));
 
         const objDot = document.createElement("div");
         if (obj.type === "canvas") {
@@ -197,8 +199,8 @@ export default class MapLayersView extends HTMLElement {
 
         const delButton = new LeafButton('', '', 'fa fa-trash', true);
         delButton.addEventListener('click', (e) => {
-            this._handleObjRemoved(e, objectDiv, objectEditDiv);
-            this._onObjectRemoveClickHandler!(obj);
+            e.stopPropagation();
+            this._onObjectRemoved!(obj);
         });
 
         objectDiv.appendChild(objDot);
@@ -298,6 +300,11 @@ export default class MapLayersView extends HTMLElement {
             colorDiv.addEventListener('click', () => {
                 colorsDiv.querySelectorAll('.color').forEach(el => el.classList.remove('selected'));
                 colorDiv.classList.add('selected');
+
+                if (obj.type !== "canvas") {
+                    objDot.style.background = c;
+                }
+
                 this._objectColorChangeHandler!(obj, c);
             });
             colorsDiv.appendChild(colorDiv);
@@ -343,22 +350,25 @@ export default class MapLayersView extends HTMLElement {
         this._objectList!.appendChild(objectEditDiv);
     }
 
-    _handleObjSelected(objectDiv: HTMLDivElement, objectEditDiv: HTMLDivElement) {
-        const selected = objectDiv.classList.contains('selected');
+    handleObjectSelected(obj: MapObject) {
+        const { objectDiv, objectEditDiv } = this._getObjectDivs(obj);
+        const selected = objectDiv!.classList.contains('selected');
         this._unselectObjDivs();
         this._hideObjEditors();
         if (!selected) {
-            objectDiv.classList.add('selected');
-            this.scrollTo({behavior: "smooth", top: objectDiv.clientTop});
-            this._showObjEditor(objectEditDiv);
+            objectDiv!.classList.add('selected');
+            this.scrollTo({behavior: "smooth", top: objectDiv!.clientTop});
+            this._showObjEditor(objectEditDiv!);
         }
     }
 
-    _handleObjRemoved(e: MouseEvent, objectDiv: HTMLDivElement, objectEditorDiv: HTMLDivElement) {
-        e.stopPropagation();
+    handleObjectRemoved(object: MapObject) {
+        const { objectDiv, objectEditDiv } = this._getObjectDivs(object);
         this._unselectObjDivs();
+
         objectDiv.remove();
-        objectEditorDiv.remove();
+        objectEditDiv.remove();
+
         this._objectListItemsCount--;
         this._updateObjectHeaderContent();
         if (this._objectListItemsCount === 0) {
@@ -367,13 +377,30 @@ export default class MapLayersView extends HTMLElement {
         }
     }
 
-    _handleRemoveAllObjs(e: MouseEvent) {
-        e.stopPropagation();
+    handleAllObjectsRemoved() {
         this._removeObjDivs();
         this._objectListItemsCount = 0;
         this._updateObjectHeaderContent();
         this._hideDelAllDiv();
         this._showObjectListEmptyDiv();
+    }
+
+    handleObjectDeselected() {
+        this._unselectObjDivs();
+        this._hideObjEditors();
+    }
+
+    _getObjectDivs(object: MapObject): ObjectDivs {
+        const objectDivOpt = this._objectList!.querySelector(`[data-object-id="${object.ID}"]`)!;
+        const objectEditDivOpt = this._objectList!.querySelector(`[data-object-edit-id="${object.ID}"]`)!;
+        if (!objectDivOpt || !objectEditDivOpt) {
+            throw new Error("This object is not in the UI so it cannot be selected, id: " + object.ID);
+        }
+
+        return {
+            objectDiv: objectDivOpt as HTMLDivElement,
+            objectEditDiv: objectEditDivOpt as HTMLDivElement
+        };
     }
 
     _showObjEditor(objEditDiv: HTMLDivElement) {
@@ -386,24 +413,20 @@ export default class MapLayersView extends HTMLElement {
         });
     }
 
-    onObjectClick(handler: (obj: MapObject) => void) {
-        this._onObjectClickHandler = handler;
+    onObjectSelected(handler: (obj: MapObject) => void) {
+        this._onObjectSelected = handler;
     }
 
-    onObjectRemoveClick(handler: (obj: MapObject) => void) {
-        this._onObjectRemoveClickHandler = handler;
+    onObjectRemoved(handler: (obj: MapObject) => void) {
+        this._onObjectRemoved = handler;
     }
 
-    onObjectRemoveAllClick(handler: () => void) {
-        this._onObjectRemoveAllClickHandler = handler;
+    onObjectRemoveAll(handler: () => void) {
+        this._onAllObjectsRemoved = handler;
     }
 
-    onMapLayersTabClick(handler: () => void) {
-        this._layersTabBtn!.addEventListener('click', () => {
-            this._unselectObjDivs();
-            this._hideObjEditors();
-            handler();
-        });
+    onObjectDeselect(handler: () => void) {
+        this._onObjectDeselect = handler;
     }
 
     _updateObjectHeaderContent() {
@@ -435,6 +458,9 @@ export default class MapLayersView extends HTMLElement {
             this._objectsTabBtn!.classList.remove('active');
             layersPanel!.hidden = false;
             objectsPanel!.hidden = true;
+
+            // deselect obj
+            this._onObjectDeselect!();
         });
 
         this._objectsTabBtn!.addEventListener('click', () => {
