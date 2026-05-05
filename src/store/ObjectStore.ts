@@ -26,4 +26,11 @@ export default class ObjectStore {
         this._mapObjects = this._mapObjects.filter((o) => o !== obj);
         this._mapObjectLayer.removeLayer(obj.layer);
     }
+
+    removeAll() {
+        this._mapObjects = [];
+        this._mapObjectLayer.eachLayer((layer) => {
+           layer.remove();
+        });
+    }
 }

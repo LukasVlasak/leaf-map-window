@@ -27,6 +27,7 @@ export default class MapLayersView extends HTMLElement {
 
     private _onObjectClickHandler: ((obj: MapObject) => void) | undefined = undefined;
     private _onObjectRemoveClickHandler: ((obj: MapObject) => void) | undefined = undefined;
+    private _onObjectRemoveAllClickHandler: (() => void) | undefined = undefined;
 
     private _objectListItemsCount: number = 0;
 
@@ -36,6 +37,8 @@ export default class MapLayersView extends HTMLElement {
     private _objectStrokeWidthChangeHandler: ((obj: MapObject, width: number) => void) | undefined = undefined;
     private _objectOpacityChangeHandler: ((obj: MapObject, opcaity: number) => void) | undefined = undefined;
     private _objectPopupChangeHandler: ((obj: MapObject, popup: string) => void) | undefined = undefined;
+
+    private _delAllDiv: HTMLDivElement | undefined = undefined;
 
     constructor() {
         super();
@@ -127,7 +130,19 @@ export default class MapLayersView extends HTMLElement {
 
         objectsPanel.appendChild(this._objectListEmptyDiv);
 
+        this._delAllDiv = document.createElement("div");
+        this._delAllDiv.className = 'del-all';
+        const deleteAll = new LeafButton('', 'Smazat vše', undefined, true, false, 'Smazat vše');
+        this._delAllDiv.style.display = 'none';
+        deleteAll.addEventListener('click', (e) => {
+            this._handleRemoveAllObjs(e);
+            this._onObjectRemoveAllClickHandler!();
+        });
+        this._delAllDiv.appendChild(deleteAll);
+        this._hideDelAllDiv();
+
         objectsPanel.appendChild(this._objectList);
+        objectsPanel.appendChild(this._delAllDiv);
 
         body.appendChild(layersPanel);
         body.appendChild(objectsPanel);
@@ -141,6 +156,7 @@ export default class MapLayersView extends HTMLElement {
 
     addObject(obj: MapObject) {
         this._hideObjectListEmptyDiv();
+        this._showDelAllDiv();
         this._objectListItemsCount++;
         this._updateObjectHeaderContent();
 
@@ -181,7 +197,7 @@ export default class MapLayersView extends HTMLElement {
 
         const delButton = new LeafButton('', '', 'fa fa-trash', true);
         delButton.addEventListener('click', (e) => {
-            this._handleObjRemoved(e, objectDiv);
+            this._handleObjRemoved(e, objectDiv, objectEditDiv);
             this._onObjectRemoveClickHandler!(obj);
         });
 
@@ -338,15 +354,26 @@ export default class MapLayersView extends HTMLElement {
         }
     }
 
-    _handleObjRemoved(e: MouseEvent, objectDiv: HTMLDivElement) {
+    _handleObjRemoved(e: MouseEvent, objectDiv: HTMLDivElement, objectEditorDiv: HTMLDivElement) {
         e.stopPropagation();
         this._unselectObjDivs();
         objectDiv.remove();
+        objectEditorDiv.remove();
         this._objectListItemsCount--;
         this._updateObjectHeaderContent();
         if (this._objectListItemsCount === 0) {
+            this._hideDelAllDiv();
             this._showObjectListEmptyDiv();
         }
+    }
+
+    _handleRemoveAllObjs(e: MouseEvent) {
+        e.stopPropagation();
+        this._removeObjDivs();
+        this._objectListItemsCount = 0;
+        this._updateObjectHeaderContent();
+        this._hideDelAllDiv();
+        this._showObjectListEmptyDiv();
     }
 
     _showObjEditor(objEditDiv: HTMLDivElement) {
@@ -367,6 +394,10 @@ export default class MapLayersView extends HTMLElement {
         this._onObjectRemoveClickHandler = handler;
     }
 
+    onObjectRemoveAllClick(handler: () => void) {
+        this._onObjectRemoveAllClickHandler = handler;
+    }
+
     onMapLayersTabClick(handler: () => void) {
         this._layersTabBtn!.addEventListener('click', () => {
             this._unselectObjDivs();
@@ -385,6 +416,14 @@ export default class MapLayersView extends HTMLElement {
 
     _showObjectListEmptyDiv() {
         this._objectListEmptyDiv!.style.display = 'block';
+    }
+
+    _hideDelAllDiv() {
+        this._delAllDiv!.style.display = 'none';
+    }
+
+    _showDelAllDiv() {
+        this._delAllDiv!.style.display = 'flex';
     }
 
     _initListeners(layersPanel: HTMLDivElement, objectsPanel: HTMLDivElement) {
@@ -409,6 +448,15 @@ export default class MapLayersView extends HTMLElement {
     _unselectObjDivs() {
         this._objectList?.querySelectorAll('.obj').forEach((el) => {
            el.classList.remove('selected');
+        });
+    }
+
+    _removeObjDivs() {
+        this._objectList?.querySelectorAll('.obj').forEach((el) => {
+            el.remove();
+        });
+        this._objectList?.querySelectorAll('.obj-editor').forEach((el) => {
+            el.remove();
         });
     }
 

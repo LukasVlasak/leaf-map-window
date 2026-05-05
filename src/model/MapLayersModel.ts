@@ -21,6 +21,7 @@ export default class MapLayersModel {
     _initListeners() {
         this._mapLayersView.onObjectClick(this._onObjectClick.bind(this));
         this._mapLayersView.onObjectRemoveClick(this._objectStore.removeObject.bind(this._objectStore));
+        this._mapLayersView.onObjectRemoveAllClick(this._objectStore.removeAll.bind(this._objectStore));
         this._mapLayersView.onMapLayersTabClick(this._onMapLayersTabClick.bind(this));
 
         this._mapLayersView.onObjectNameChange((obj, name) => obj.name = name);
