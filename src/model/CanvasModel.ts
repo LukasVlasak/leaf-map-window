@@ -4,6 +4,7 @@ import type CanvasView from "../view/components/Canvas/CanvasView";
 import type {IEvent} from "fabric/fabric-impl";
 import L, {type LatLngBoundsExpression} from "leaflet";
 import MapObject from "./MapObject";
+import {DEFAULT_EDIT_COLORS} from "../view/MapLayers/MapLayersView";
 
 const DEFAULT_CIRCLE_OPTIONS = {
     radius: 1,
@@ -444,9 +445,12 @@ export default class CanvasModel {
         const coordinates = this._getCanvasCoordinates();
         const img = new L.ImageOverlay(url, coordinates, {
             alt:  'Uložené canvas plátno',
-            className: 'canvas-img'
+            className: 'default-canvas-class',
+            opacity: 1,
+            interactive: true,
         });
-        this._objectStore.addObject(new MapObject(coordinates, img, "canvas"));
+        const canvasObj = new MapObject(coordinates, img, "canvas", img.options.opacity! * 100, undefined, undefined, DEFAULT_EDIT_COLORS[5], 1);
+        this._objectStore.addObject(canvasObj);
     }
 
     _getCanvasCoordinates(): LatLngBoundsExpression {

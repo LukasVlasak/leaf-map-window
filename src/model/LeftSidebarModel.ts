@@ -4,29 +4,33 @@ import type ObjectStore from "../store/ObjectStore";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
-import Utils from "../utils/Utils";
 import MapObject from "./MapObject";
+import {DEFAULT_EDIT_COLORS} from "../view/MapLayers/MapLayersView";
 
 const POLYGON_DRAW_OPTIONS = {
+    selectable: false,
+    interactive: false,
     showLength: false,
     shapeOptions: {
-        color: '#0d9488',
+        color: DEFAULT_EDIT_COLORS[0],
         weight: 2,
         opacity: 1
     }
 };
 
 const POLYLINE_DRAW_OPTIONS = {
+    selectable: false,
+    interactive: false,
     showLength: false,
     shapeOptions: {
-        color: '#3388ff',
+        color: DEFAULT_EDIT_COLORS[2],
         weight: 2,
         opacity: 1
     }
 };
 
 const FREEDRAW_OPTIONS = {
-    color: '#0077ff',
+    color: DEFAULT_EDIT_COLORS[5],
     weight: 3,
     opacity: 1
 };
@@ -97,8 +101,7 @@ export default class LeftSidebarModel {
             }
 
             const options = layer.options as L.PathOptions;
-            this._objectStore.addObject(new MapObject(coordinates, layer, type, options.opacity, undefined, undefined, options.color, options.weight));
-            this._showMeasurement(layer, type);
+            this._objectStore.addObject(new MapObject(coordinates, layer, type, options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
 
             this._disableDrawers();
             this._leftSidebarView.deactivateToolBtns();
@@ -149,8 +152,7 @@ export default class LeftSidebarModel {
         e.originalEvent.preventDefault();
         this._isDrawing = true;
         this._freedrawLine = polyline([e.latlng], FREEDRAW_OPTIONS);
-        const options = this._freedrawLine.options as L.PathOptions;
-        this._objectStore.addObject(new MapObject([e.latlng], this._freedrawLine, "polyline", options.opacity, undefined, undefined, options.color, options.weight));
+        this._freedrawLine.addTo(this._map);
     }
 
     private _mousemoveFreedraw(e: LeafletMouseEvent) {
@@ -173,7 +175,12 @@ export default class LeftSidebarModel {
         e.originalEvent.preventDefault();
         this._isDrawing = false;
         this._freedrawLine!.addLatLng(e.latlng);
-        this._showMeasurement(this._freedrawLine!, "polyline");
+        this._freedrawLine!.remove();
+
+        const line = this._freedrawLine!;
+        const options = line.options as L.PathOptions;
+        this._objectStore.addObject(new MapObject(line.getLatLngs() as L.LatLng[], line, "polyline", options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
+        setTimeout(() => { if (line.getPopup()) line.openPopup(); }, 0);
 
         this._disableDrawers();
         this._leftSidebarView.deactivateToolBtns();
@@ -216,32 +223,5 @@ export default class LeftSidebarModel {
         if (doNotDisable !== "canvas") {
             this._canvasModel.onCanvasClose();
         }
-    }
-
-    private _calcPolylineDistance(coordinates: L.LatLng[]): number {
-        let distance = 0;
-        for (let i = 0; i < coordinates.length - 1; i++) {
-            distance += coordinates[i]!.distanceTo(coordinates[i + 1]!);
-        }
-        return distance;
-    }
-
-    private _showMeasurement(layer: L.Polyline | L.Polygon, layerType?: string) {
-        let content: string;
-
-        if (layerType === "polygon") {
-            const outerRing = (layer.getLatLngs() as L.LatLng[][])[0]!;
-            const area = L.GeometryUtil.geodesicArea(
-                outerRing.map(l => ({ lat: l.lat, lng: l.lng }))
-            );
-            const circuit = this._calcPolylineDistance([...outerRing, outerRing[0]!]);
-            content = `<b>Obsah:</b> ${Utils.formatArea(area)}<br><b>Obvod:</b> ${Utils.formatDistance(circuit)}`;
-        } else {
-            const latlngs = layer.getLatLngs() as L.LatLng[];
-            const distance = this._calcPolylineDistance(latlngs);
-            content = `<b>Délka:</b> ${Utils.formatDistance(distance)}`;
-        }
-
-        layer.bindPopup(content).openPopup();
     }
 }

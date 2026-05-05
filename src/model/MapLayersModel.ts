@@ -22,6 +22,13 @@ export default class MapLayersModel {
         this._mapLayersView.onObjectClick(this._onObjectClick.bind(this));
         this._mapLayersView.onObjectRemoveClick(this._objectStore.removeObject.bind(this._objectStore));
         this._mapLayersView.onMapLayersTabClick(this._onMapLayersTabClick.bind(this));
+
+        this._mapLayersView.onObjectNameChange((obj, name) => obj.name = name);
+        this._mapLayersView.onObjectDescriptionChange((obj, description) => obj.description = description);
+        this._mapLayersView.onObjectColorChange((obj, color) => obj.color = color);
+        this._mapLayersView.onObjectStrokeWidthChange((obj, width) => obj.strokeWidth = width);
+        this._mapLayersView.onObjectOpacityChange((obj, opacity) => obj.opacity = opacity);
+        this._mapLayersView.onObjectPopupChange((obj, popup) => obj.popup = popup);
     }
 
     private _onMapLayersTabClick() {
@@ -50,7 +57,7 @@ export default class MapLayersModel {
                 object.layer.setStyle({ color: SELECTED_OBJECT_COLOR, fillColor: SELECTED_OBJECT_COLOR });
                 break;
             case "canvas":
-                (object.layer.getElement() as HTMLImageElement).style.outline = '2px solid ' + SELECTED_OBJECT_COLOR;
+                (object.layer.getElement() as HTMLImageElement).style.outline = object.strokeWidth + 'px solid ' + SELECTED_OBJECT_COLOR;
                 break;
         }
     }
@@ -62,7 +69,7 @@ export default class MapLayersModel {
                 object.layer.setStyle({ color: object.color, fillColor: object.color });
                 break;
             case "canvas":
-                (object.layer.getElement() as HTMLImageElement).style.outline = '';
+                (object.layer.getElement() as HTMLImageElement).style.outline = object.strokeWidth + 'px solid ' + object.color;
                 break;
         }
     }

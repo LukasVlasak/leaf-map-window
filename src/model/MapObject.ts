@@ -1,45 +1,99 @@
-import {type LatLng, type LatLngBoundsExpression, tooltip} from "leaflet";
+import L, {type LatLng, type LatLngBoundsExpression} from "leaflet";
+import Utils from "../utils/Utils";
 
 type LeafLayer = L.Polyline | L.Polygon | L.ImageOverlay;
 type LeafObjType = "polygon" | "polyline" | "canvas";
 
 export default class MapObject {
     private _ID: string;
+    // @ts-ignore
     private _name: string;
     private _coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][];
     private _layer: LeafLayer;
     private _type: LeafObjType;
+    private _distance?: number = undefined;
+    private _area?: number = undefined;
+    private _circuit?: number = undefined;
     private _description?: string = undefined;
     private _color?: string = undefined;
     private _strokeWidth?: number = undefined;
-    private _tooltip?: string = undefined;
-    private _isTooltipOnHover: boolean = false;
-    private _opacity: number = 0.8;
+    private _popup?: string = undefined;
+    // 0 - 100
+    private _opacity: number = 100;
 
-    constructor(coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][], layer: LeafLayer, type: LeafObjType, opacity?: number, name?: string, description?: string, color?: string, strokeWidth?: number, tooltip?: string) {
+    constructor(coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][], layer: LeafLayer, type: LeafObjType, opacity?: number, name?: string, description?: string, color?: string, strokeWidth?: number, popup?: string) {
         this._ID = crypto.randomUUID();
         this._coordinates = coordinates;
         this._layer = layer;
         this._type = type;
+        this._calculateMeasurement();
         if (name) {
-            this._name = name;
+            this.name = name;
         } else {
-            this._name = type;
+            this.name = type;
         }
         if (opacity) {
-            this._opacity = opacity;
+            this.opacity = opacity;
         }
         if (description) {
-            this._description = description;
+            this.description = description;
         }
+        // color and strokeWidth of canvas is set as layer.getElement().style
+        // getElement() is not present now - instead a default CSS class exists that set these props to the element (.default-canvas-class)
         if (color) {
-            this._color = color;
+            if (type !== "canvas") {
+                this.color = color;
+            } else {
+                this._color = color;
+            }
         }
         if (strokeWidth) {
-            this._strokeWidth = strokeWidth;
+            if (type !== "canvas") {
+                this.strokeWidth = strokeWidth;
+            } else {
+                this._strokeWidth = strokeWidth;
+            }
         }
-        if (tooltip) {
-            this._tooltip = tooltip;
+
+        if (popup) {
+            this.popup = popup;
+        } else {
+            this._setDefaultPopup();
+        }
+    }
+
+    private _setDefaultPopup() {
+        if (this._circuit && this._area) {
+            this.popup = `<b>Obsah:</b> ${Utils.formatArea(this._area)}<br><b>Obvod:</b> ${Utils.formatDistance(this._circuit)}`;
+        } else if (this._distance) {
+            this.popup = `<b>Délka:</b> ${Utils.formatDistance(this._distance)}`;
+        } else if (this._circuit) {
+            this.popup = `<b>Obvod:</b> ${Utils.formatDistance(this._circuit)}`;
+        }
+    }
+
+    private _calcPolylineDistance(coordinates: L.LatLng[]): number {
+        let distance = 0;
+        for (let i = 0; i < coordinates.length - 1; i++) {
+            distance += coordinates[i]!.distanceTo(coordinates[i + 1]!);
+        }
+        return distance;
+    }
+
+    private _calculateMeasurement() {
+        if (this.type === "polygon") {
+            const outerRing = ((this.layer as L.Polygon).getLatLngs() as L.LatLng[][])[0]!;
+            this.area = L.GeometryUtil.geodesicArea(
+                outerRing.map(l => ({ lat: l.lat, lng: l.lng }))
+            );
+            this.circuit = this._calcPolylineDistance([...outerRing, outerRing[0]!]);
+        } else if (this.type === "polyline") {
+            const latlngs = (this.layer as L.Polyline).getLatLngs() as L.LatLng[];
+            this.distance = this._calcPolylineDistance(latlngs);
+        } else {
+            const bounds = this.layer.getBounds();
+            const outerRing = [bounds.getNorthWest(), bounds.getNorthEast(), bounds.getSouthEast(), bounds.getSouthWest()];
+            this.circuit = this._calcPolylineDistance([...outerRing, outerRing[0]!]);
         }
     }
 
@@ -76,12 +130,43 @@ export default class MapObject {
         return this._strokeWidth;
     }
 
-    get tooltip(): string | undefined {
-        return this._tooltip;
+    set distance(value: number) {
+        this._distance = value;
     }
 
-    get isTooltipOnHover(): boolean {
-        return this._isTooltipOnHover;
+    set area(value: number) {
+        this._area = value;
+    }
+
+    set circuit(value: number) {
+        this._circuit = value;
+    }
+
+    get popup(): string | undefined {
+        return this._popup;
+    }
+
+    set popup(value: string) {
+        this._popup = value;
+        if (value) {
+            this._layer.bindPopup(value).openPopup();
+        } else {
+            this._layer.closePopup();
+            this._layer.unbindPopup();
+        }
+    }
+
+
+    get distance(): number | undefined {
+        return this._distance;
+    }
+
+    get area(): number | undefined {
+        return this._area;
+    }
+
+    get circuit(): number | undefined {
+        return this._circuit;
     }
 
     get opacity(): number {
@@ -98,21 +183,24 @@ export default class MapObject {
 
     set color(value: string) {
         this._color = value;
+        if (this.type === "canvas") {
+            (this.layer.getElement() as HTMLDivElement).style.outline = this.strokeWidth + 'px solid ' + value;
+        } else {
+            this.layer.setStyle({color: value, fillColor: value});
+        }
     }
 
     set strokeWidth(value: number) {
         this._strokeWidth = value;
-    }
-
-    set tooltip(value: string) {
-        this._tooltip = value;
-    }
-
-    set isTooltipOnHover(value: boolean) {
-        this._isTooltipOnHover = value;
+        if (this.type !== "canvas") {
+            this.layer.setStyle({weight: value});
+        } else {
+            (this.layer.getElement() as HTMLDivElement).style.outline = value + 'px solid ' + this.color;
+        }
     }
 
     set opacity(value: number) {
-        this._opacity = value;
+        this._opacity = value / 100;
+        this.layer.setStyle({opacity: this.opacity, fillOpacity: this.opacity});
     }
 }

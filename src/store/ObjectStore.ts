@@ -16,6 +16,9 @@ export default class ObjectStore {
     addObject(obj: MapObject) {
         this._mapObjects.push(obj);
         this._mapObjectLayer.addLayer(obj.layer);
+        if (obj.popup) {
+            obj.layer.openPopup();
+        }
         this._mapLayersView.addObject(obj);
     }
 

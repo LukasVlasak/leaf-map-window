@@ -2,8 +2,9 @@ import type MapObject from "../../model/MapObject";
 import LeafButton from "../components/Button/LeafButton";
 import LeafInput from "../components/Input/LeafInput";
 import LeafSlider from "../components/Slider/LeafSlider";
+import Utils from "../../utils/Utils";
 
-const DEFAULT_EDIT_COLORS = [
+export const DEFAULT_EDIT_COLORS = [
     '#0d9488',
     '#0e7490',
     '#7c3aed',
@@ -34,8 +35,7 @@ export default class MapLayersView extends HTMLElement {
     private _objectColorChangeHandler: ((obj: MapObject, color: string) => void) | undefined = undefined;
     private _objectStrokeWidthChangeHandler: ((obj: MapObject, width: number) => void) | undefined = undefined;
     private _objectOpacityChangeHandler: ((obj: MapObject, opcaity: number) => void) | undefined = undefined;
-    private _objectTooltipChangeHandler: ((obj: MapObject, tooltip: string) => void) | undefined = undefined;
-    private _objectTooltipHoverChangeHandler: ((obj: MapObject, onHover: boolean) => void) | undefined = undefined;
+    private _objectPopupChangeHandler: ((obj: MapObject, popup: string) => void) | undefined = undefined;
 
     constructor() {
         super();
@@ -44,6 +44,10 @@ export default class MapLayersView extends HTMLElement {
     connectedCallback(): void {
         this.className = 'side-panel';
         this.addEventListener('wheel', (e) => e.stopPropagation());
+        this.addEventListener('mousedown', (e) => e.stopPropagation());
+        this.addEventListener('dblclick', (e) => e.stopPropagation());
+        this.addEventListener('touchstart', (e) => e.stopPropagation());
+        this.addEventListener('click', (e) => e.stopPropagation());
 
         // header
         const head = document.createElement('div');
@@ -193,7 +197,10 @@ export default class MapLayersView extends HTMLElement {
         nameLabel.className = 'field-label';
         nameLabel.textContent = 'Název';
         const nameInput = new LeafInput('name', 'Název', obj.name);
-        nameInput.addEventListener('change', (e) => this._objectNameChangeHandler!(obj, (e.target as HTMLInputElement).value));
+        nameInput.addEventListener('change', (e) => {
+            objName.textContent = (e.target as HTMLInputElement).value;
+            this._objectNameChangeHandler!(obj, (e.target as HTMLInputElement).value);
+        });
         nameField.appendChild(nameLabel);
         nameField.appendChild(nameInput);
         objectEditDiv.appendChild(nameField);
@@ -208,95 +215,113 @@ export default class MapLayersView extends HTMLElement {
         descTextarea.placeholder = 'Popis objektu…';
         descTextarea.rows = 3;
         descTextarea.value = obj.description || '';
-        descTextarea.addEventListener('change', (e) => this._objectDescriptionChangeHandler!(obj, (e.target as HTMLInputElement).value));
+        descTextarea.addEventListener('change', (e) => {
+            objDesc.textContent = (e.target as HTMLInputElement).value;
+            this._objectDescriptionChangeHandler!(obj, (e.target as HTMLInputElement).value);
+        });
         descField.appendChild(descLabel);
         descField.appendChild(descTextarea);
         objectEditDiv.appendChild(descField);
 
-        if (obj.type !== "canvas") {
-            const colorField = document.createElement("div");
-            colorField.className = 'field';
-            const colorLabel = document.createElement("label");
-            colorLabel.className = 'field-label';
-            colorLabel.textContent = 'Barva';
-            const colorsDiv = document.createElement("div");
-            colorsDiv.className = 'colors';
-            DEFAULT_EDIT_COLORS.forEach(c => {
-                const colorDiv = document.createElement("div");
-                colorDiv.className = 'color' + (obj.color === c ? ' selected' : '');
-                colorDiv.style.background = c;
-                colorDiv.addEventListener('click', () => {
-                    colorsDiv.querySelectorAll('.color').forEach(el => el.classList.remove('selected'));
-                    colorDiv.classList.add('selected');
-                    this._objectColorChangeHandler!(obj, c);
-                });
-                colorsDiv.appendChild(colorDiv);
-            });
-            colorField.appendChild(colorLabel);
-            colorField.appendChild(colorsDiv);
-            objectEditDiv.appendChild(colorField);
+        if (obj.distance) {
+            const distanceDiv = document.createElement("div");
+            distanceDiv.className = 'field';
+            const distanceLabel = document.createElement("label");
+            distanceLabel.className = 'field-label';
+            distanceLabel.textContent = 'Vzdálenost';
+            const distanceVal = document.createElement("span");
+            distanceVal.className = 'text-val';
+            distanceVal.textContent = Utils.formatDistance(obj.distance);
 
-            const strokeField = document.createElement("div");
-            strokeField.className = 'field';
-            const strokeLabel = document.createElement("label");
-            strokeLabel.className = 'field-label';
-            strokeLabel.textContent = 'Tloušťka čáry';
-            const strokeSlider = new LeafSlider(1, 10, obj.strokeWidth ?? 2, ' px');
-            strokeSlider.onChange((val) => this._objectStrokeWidthChangeHandler!(obj, val));
-            strokeField.appendChild(strokeLabel);
-            strokeField.appendChild(strokeSlider);
-            objectEditDiv.appendChild(strokeField);
+            distanceDiv.appendChild(distanceLabel);
+            distanceDiv.appendChild(distanceVal);
+            objectEditDiv.appendChild(distanceDiv);
         }
+
+        if (obj.circuit) {
+            const circuitDiv = document.createElement("div");
+            circuitDiv.className = 'field';
+            const circuitLabel = document.createElement("label");
+            circuitLabel.className = 'field-label';
+            circuitLabel.textContent = 'Obvod';
+            const circuitVal = document.createElement("span");
+            circuitVal.className = 'text-val';
+            circuitVal.textContent = Utils.formatDistance(obj.circuit);
+
+            circuitDiv.appendChild(circuitLabel);
+            circuitDiv.appendChild(circuitVal);
+            objectEditDiv.appendChild(circuitDiv);
+        }
+
+        if (obj.area) {
+            const areaDiv = document.createElement("div");
+            areaDiv.className = 'field';
+            const areaLabel = document.createElement("label");
+            areaLabel.className = 'field-label';
+            areaLabel.textContent = 'Obsah';
+            const areaVal = document.createElement("span");
+            areaVal.className = 'text-val';
+            areaVal.textContent = Utils.formatArea(obj.area);
+
+            areaDiv.appendChild(areaLabel);
+            areaDiv.appendChild(areaVal);
+            objectEditDiv.appendChild(areaDiv);
+        }
+
+        const colorField = document.createElement("div");
+        colorField.className = 'field';
+        const colorLabel = document.createElement("label");
+        colorLabel.className = 'field-label';
+        colorLabel.textContent = 'Barva';
+        const colorsDiv = document.createElement("div");
+        colorsDiv.className = 'colors';
+        DEFAULT_EDIT_COLORS.forEach(c => {
+            const colorDiv = document.createElement("div");
+            colorDiv.className = 'color' + (obj.color === c ? ' selected' : '');
+            colorDiv.style.background = c;
+            colorDiv.addEventListener('click', () => {
+                colorsDiv.querySelectorAll('.color').forEach(el => el.classList.remove('selected'));
+                colorDiv.classList.add('selected');
+                this._objectColorChangeHandler!(obj, c);
+            });
+            colorsDiv.appendChild(colorDiv);
+        });
+        colorField.appendChild(colorLabel);
+        colorField.appendChild(colorsDiv);
+        objectEditDiv.appendChild(colorField);
+
+        const strokeField = document.createElement("div");
+        strokeField.className = 'field';
+        const strokeLabel = document.createElement("label");
+        strokeLabel.className = 'field-label';
+        strokeLabel.textContent = 'Tloušťka čáry';
+        const strokeSlider = new LeafSlider(1, 10, obj.strokeWidth ?? 2, ' px');
+        strokeSlider.onChange((val) => this._objectStrokeWidthChangeHandler!(obj, val));
+        strokeField.appendChild(strokeLabel);
+        strokeField.appendChild(strokeSlider);
+        objectEditDiv.appendChild(strokeField);
 
         const opacityField = document.createElement("div");
         opacityField.className = 'field';
         const opacityLabel = document.createElement("label");
         opacityLabel.className = 'field-label';
-        opacityLabel.textContent = 'Průhlednost';
-        const opacitySlider = new LeafSlider(0, 100, Math.round(obj.opacity * 100), '%');
+        opacityLabel.textContent = 'Viditelnost';
+        const opacitySlider = new LeafSlider(0, 100, obj.opacity * 100, '%');
         opacitySlider.onChange((val) => this._objectOpacityChangeHandler!(obj, val));
         opacityField.appendChild(opacityLabel);
         opacityField.appendChild(opacitySlider);
         objectEditDiv.appendChild(opacityField);
 
-        const tooltipField = document.createElement("div");
-        tooltipField.className = 'field';
-        const tooltipLabel = document.createElement("label");
-        tooltipLabel.className = 'field-label';
-        tooltipLabel.textContent = 'Tooltip';
-        const tooltipInput = new LeafInput('tooltip', 'Text tooltipu…', obj.tooltip);
-        tooltipInput.addEventListener('change', (e) => this._objectTooltipChangeHandler!(obj, (e.target as HTMLInputElement).value));
-        tooltipField.appendChild(tooltipLabel);
-        tooltipField.appendChild(tooltipInput);
-        objectEditDiv.appendChild(tooltipField);
-
-        const tooltipHoverField = document.createElement("div");
-        tooltipHoverField.className = 'field';
-        const toggleRow = document.createElement("div");
-        toggleRow.className = 'toggle-row';
-        const toggleText = document.createElement("div");
-        toggleText.className = 'toggle-text';
-        const toggleLabelText = document.createElement("div");
-        toggleLabelText.className = 'toggle-label-text';
-        toggleLabelText.textContent = 'Tooltip při hoveru';
-        const toggleHint = document.createElement("div");
-        toggleHint.className = 'toggle-hint';
-        toggleHint.textContent = 'Zobrazit tooltip pouze při najetí myší';
-        toggleText.appendChild(toggleLabelText);
-        toggleText.appendChild(toggleHint);
-        const toggle = document.createElement("button");
-        toggle.className = 'toggle' + (obj.isTooltipOnHover ? ' on' : '');
-        const thumb = document.createElement("div");
-        thumb.className = 'thumb';
-        toggle.appendChild(thumb);
-        toggle.addEventListener('click', () => {
-            toggle.classList.toggle('on');
-            this._objectTooltipHoverChangeHandler!(obj, toggle.classList.contains('on'));
-        });
-        toggleRow.appendChild(toggleText);
-        toggleRow.appendChild(toggle);
-        tooltipHoverField.appendChild(toggleRow);
-        objectEditDiv.appendChild(tooltipHoverField);
+        const popupField = document.createElement("div");
+        popupField.className = 'field';
+        const popupLabel = document.createElement("label");
+        popupLabel.className = 'field-label';
+        popupLabel.textContent = 'Popup';
+        const popupInput = new LeafInput('popup', 'Text popupu…', obj.popup);
+        popupInput.addEventListener('change', (e) => this._objectPopupChangeHandler!(obj, (e.target as HTMLInputElement).value));
+        popupField.appendChild(popupLabel);
+        popupField.appendChild(popupInput);
+        objectEditDiv.appendChild(popupField);
 
         this._objectList!.appendChild(objectDiv);
         this._objectList!.appendChild(objectEditDiv);
@@ -308,6 +333,7 @@ export default class MapLayersView extends HTMLElement {
         this._hideObjEditors();
         if (!selected) {
             objectDiv.classList.add('selected');
+            this.scrollTo({behavior: "smooth", top: objectDiv.clientTop});
             this._showObjEditor(objectEditDiv);
         }
     }
@@ -363,6 +389,9 @@ export default class MapLayersView extends HTMLElement {
 
     _initListeners(layersPanel: HTMLDivElement, objectsPanel: HTMLDivElement) {
         this._layersTabBtn!.addEventListener('click', () => {
+            if (this.classList.contains('collapsed')) {
+                this.classList.remove('collapsed');
+            }
             this._layersTabBtn!.classList.add('active');
             this._objectsTabBtn!.classList.remove('active');
             layersPanel!.hidden = false;
@@ -403,12 +432,8 @@ export default class MapLayersView extends HTMLElement {
         this._objectOpacityChangeHandler = handler;
     }
 
-    onObjectTooltipChange(handler: (obj: MapObject, tooltip: string) => void) {
-        this._objectTooltipChangeHandler = handler;
-    }
-
-    onObjectTooltipHoverChange(handler: (obj: MapObject, onHover: boolean) => void) {
-        this._objectTooltipHoverChangeHandler = handler;
+    onObjectPopupChange(handler: (obj: MapObject, popup: string) => void) {
+        this._objectPopupChangeHandler = handler;
     }
 }
 

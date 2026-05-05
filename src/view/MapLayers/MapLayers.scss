@@ -346,6 +346,12 @@
           margin-bottom: 6px;
         }
 
+        .text-val {
+          font-size: 13px;
+          color: black;
+          font-weight: 600;
+        }
+
         .field-textarea {
           resize: vertical;
         }
@@ -410,63 +416,6 @@
             color: black;
             min-width: 36px;
             text-align: right;
-          }
-        }
-
-        .toggle-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-
-          .toggle {
-            width: 36px;
-            height: 20px;
-            background: vars.$borderStrong;
-            border-radius: 999px;
-            position: relative;
-            transition: background vars.$transitionFast;
-            flex-shrink: 0;
-            padding: 0;
-            cursor: pointer;
-
-            &.on {
-              background: vars.$primaryColor;
-
-              .thumb {
-                transform: translateX(16px);
-              }
-            }
-
-            .thumb {
-              position: absolute;
-              top: 2px;
-              left: 2px;
-              width: 16px;
-              height: 16px;
-              background: #fff;
-              border-radius: 50%;
-              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-              transition: transform vars.$transition;
-            }
-          }
-
-          .toggle-text {
-            flex: 1;
-            min-width: 0;
-
-            .toggle-label-text {
-              font-size: 13px;
-              font-weight: 500;
-              color: black;
-            }
-
-            .toggle-hint {
-              font-size: 11.5px;
-              color: vars.$mutedTextColor;
-              margin-top: 2px;
-              line-height: 1.35;
-            }
           }
         }
       }
