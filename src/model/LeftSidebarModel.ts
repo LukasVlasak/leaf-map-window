@@ -4,8 +4,8 @@ import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
 import MapObject from "./MapObject";
-import {DEFAULT_EDIT_COLORS} from "../view/MapLayers/MapLayersView";
-import type MapLayersModel from "./MapLayersModel";
+import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
+import type MapObjectsModel from "./MapObjectsModel";
 
 const POLYGON_DRAW_OPTIONS = {
     selectable: false,
@@ -43,7 +43,7 @@ interface Drawer {
 }
 
 export default class LeftSidebarModel {
-    private _mapLayersModel: MapLayersModel;
+    private _mapLayersModel: MapObjectsModel;
     private _leftSidebarView: LeftSidebarView;
     private _map: L.Map;
     private _element: string;
@@ -56,7 +56,7 @@ export default class LeftSidebarModel {
     private _freedrawLine: L.Polyline | null = null;
     private _freedrawDelay: number = FREEDRAW_DELAY;
 
-    constructor(mapLayersModel: MapLayersModel, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel) {
+    constructor(mapLayersModel: MapObjectsModel, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel) {
         this._mapLayersModel = mapLayersModel;
         this._leftSidebarView = leftSidebarView;
         this._map = map;

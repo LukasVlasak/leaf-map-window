@@ -1,0 +1,175 @@
+@use "../../styles/variables" as vars;
+
+.side-panel {
+  .panel-body {
+    .obj {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-top: 1px solid vars.$borderStrong;
+
+      &.selected {
+        background: vars.$lightPrimaryColor;
+        border-left: 2px solid vars.$primaryColor;
+        padding-left: 12px;
+
+        &:hover {
+          background: vars.$lightPrimaryColor !important;
+        }
+      }
+
+      &:hover {
+        cursor: pointer;
+        background: vars.$bgSurfaceMuted;
+      }
+
+      &:first-of-type { border-top: 0; }
+
+      .obj-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+
+      .obj-dot-icon {
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: vars.$mutedTextColor;
+        font-size: 14px;
+      }
+
+      .obj-info {
+        flex: 1;
+        min-width: 0;
+
+        .obj-name {
+          font-size: 13.5px;
+          font-weight: 500;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .obj-meta {
+          font-size: 11px;
+          color: vars.$mutedTextColor;
+        }
+      }
+    }
+
+    .obj-editor {
+      border-top: 1px solid vars.$borderLight;
+      background: vars.$bgSurfaceMuted;
+      padding: 14px 16px 16px;
+
+      .field {
+        margin-bottom: 20px;
+
+        .field-label {
+          display: block;
+          font-size: 10px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: vars.$mutedTextColor;
+          font-weight: 600;
+          margin-bottom: 6px;
+        }
+
+        .text-val {
+          font-size: 13px;
+          color: black;
+          font-weight: 600;
+        }
+
+        .field-textarea {
+          resize: vertical;
+        }
+
+        .field-input, .field-textarea {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 8px 10px;
+          font-size: 13px;
+          font-family: inherit;
+          color: black;
+          background: white;
+          border: 1px solid vars.$borderStrong;
+          border-radius: vars.$iconRadius;
+          outline: none;
+          transition: border-color vars.$transitionFast, box-shadow vars.$transitionFast;
+
+            &:focus {
+              border-color: vars.$primaryColor;
+              box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+            }
+        }
+
+        .colors {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+
+          .color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+            transition: transform vars.$transitionFast, border-color vars.$transitionFast;
+
+            &.selected {
+              border-color: black;
+              transform: scale(1.08);
+            }
+          }
+        }
+
+        .field-range-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .slider {
+            appearance: none;
+            flex: 1;
+            height: 4px;
+            background: black;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+          }
+
+          .slider-val {
+            font-size: 11px;
+            color: black;
+            min-width: 36px;
+            text-align: right;
+          }
+        }
+      }
+    }
+
+    .empty {
+      padding: 30px 20px;
+      text-align: center;
+      color: vars.$mutedTextColor;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .del-all {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+      margin-top: 15px;
+    }
+  }
+}

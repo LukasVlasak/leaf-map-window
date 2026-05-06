@@ -3,8 +3,8 @@ import type CanvasView from "../view/components/Canvas/CanvasView";
 import type {IEvent} from "fabric/fabric-impl";
 import L, {type LatLngBoundsExpression} from "leaflet";
 import MapObject from "./MapObject";
-import {DEFAULT_EDIT_COLORS} from "../view/MapLayers/MapLayersView";
-import type MapLayersModel from "./MapLayersModel";
+import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
+import type MapObjectsModel from "./MapObjectsModel";
 
 const DEFAULT_CIRCLE_OPTIONS = {
     radius: 1,
@@ -75,7 +75,7 @@ export type DrawType = "circle" | "polygon" | "line" | "polyline" | "point" | "t
 export default class CanvasModel {
     private _fabricCanvas;
 
-    private _mapLayersModel: MapLayersModel;
+    private _mapLayersModel: MapObjectsModel;
     private _canvasView: CanvasView;
     private _map: L.Map;
 
@@ -90,7 +90,7 @@ export default class CanvasModel {
     private _polyLineTempLine: fabric.Line | undefined = undefined;
     private _polyLinePointMarkers: fabric.Rect[] = [];
 
-    constructor(mapLayersModel: MapLayersModel, canvasView: CanvasView, map: L.Map) {
+    constructor(mapLayersModel: MapObjectsModel, canvasView: CanvasView, map: L.Map) {
         this._fabricCanvas = new fabric.Canvas('canvas');
 
         this._mapLayersModel = mapLayersModel;

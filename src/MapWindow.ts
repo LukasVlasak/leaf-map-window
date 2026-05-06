@@ -2,7 +2,7 @@ import * as L from "leaflet";
 import LeftSidebarView from "./view/LeftSidebar/LeftSidebarView";
 import MapControlView from "./view/MapControls/MapControlView";
 import MapControlModel from "./model/MapControlModel";
-import MapLayersView from "./view/MapLayers/MapLayersView";
+import MapLayersPanelView from "./view/MapLayers/MapLayersPanelView";
 import SearchBarView from "./view/SearchBar/SearchBarView";
 import MapStatusBarView from "./view/MapStatusBar/MapStatusBarView";
 import AttributionControlView from "./view/AttributionControl/AttributionControlView";
@@ -12,6 +12,7 @@ import ObjectStore from "./store/ObjectStore";
 import CanvasView from "./view/components/Canvas/CanvasView";
 import CanvasModel from "./model/CanvasModel";
 import MapLayersModel from "./model/MapLayersModel";
+import MapObjectsModel from "./model/MapObjectsModel";
 
 export default class MapWindow {
     map: L.Map;
@@ -31,19 +32,20 @@ export default class MapWindow {
     private initView(): void {
         const container = this.map.getContainer();
 
-        const mapLayersView = new MapLayersView();
-        container.appendChild(mapLayersView);
+        const mapLayersPanelView = new MapLayersPanelView();
+        container.appendChild(mapLayersPanelView);
+        new MapLayersModel(mapLayersPanelView.mapLayersView, this.map);
 
         const objectStore = new ObjectStore(this.map);
-        const mapLayersModel = new MapLayersModel(mapLayersView, this.map, objectStore);
+        const mapObjectsModel = new MapObjectsModel(mapLayersPanelView.mapObjectsView, this.map, objectStore);
 
         const canvasView = new CanvasView();
         document.body.appendChild(canvasView);
-        const canvasModel = new CanvasModel(mapLayersModel, canvasView, this.map);
+        const canvasModel = new CanvasModel(mapObjectsModel, canvasView, this.map);
 
         const leftSideBarView = new LeftSidebarView();
         container.appendChild(leftSideBarView);
-        new LeftSidebarModel(mapLayersModel, leftSideBarView, this.map, this.element, canvasModel);
+        new LeftSidebarModel(mapObjectsModel, leftSideBarView, this.map, this.element, canvasModel);
 
         const mapControlView = new MapControlView();
         container.appendChild(mapControlView);
