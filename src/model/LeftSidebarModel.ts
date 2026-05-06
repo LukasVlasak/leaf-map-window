@@ -3,7 +3,7 @@ import "leaflet-draw";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
-import MapObject from "./MapObject";
+import MapObject from "../objects/MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
 import type MapObjectsModel from "./MapObjectsModel";
 

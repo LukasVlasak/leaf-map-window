@@ -1,5 +1,5 @@
 import {featureGroup} from "leaflet";
-import type MapObject from "../model/MapObject";
+import type MapObject from "../objects/MapObject";
 
 export default class ObjectStore {
     private _mapObjects: MapObject[] = [];

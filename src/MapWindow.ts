@@ -13,6 +13,7 @@ import CanvasView from "./view/components/Canvas/CanvasView";
 import CanvasModel from "./model/CanvasModel";
 import MapLayersModel from "./model/MapLayersModel";
 import MapObjectsModel from "./model/MapObjectsModel";
+import LayerStore from "./store/LayerStore";
 
 export default class MapWindow {
     map: L.Map;
@@ -34,7 +35,9 @@ export default class MapWindow {
 
         const mapLayersPanelView = new MapLayersPanelView();
         container.appendChild(mapLayersPanelView);
-        new MapLayersModel(mapLayersPanelView.mapLayersView, this.map);
+
+        const layerStore = new LayerStore();
+        new MapLayersModel(mapLayersPanelView.mapLayersView, this.map, layerStore);
 
         const objectStore = new ObjectStore(this.map);
         const mapObjectsModel = new MapObjectsModel(mapLayersPanelView.mapObjectsView, this.map, objectStore);

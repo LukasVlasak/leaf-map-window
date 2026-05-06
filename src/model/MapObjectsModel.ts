@@ -1,5 +1,5 @@
 import type MapObjectsView from "../view/MapObjects/MapObjectsView";
-import type MapObject from "./MapObject";
+import type MapObject from "../objects/MapObject";
 import type ObjectStore from "../store/ObjectStore";
 
 const SELECTED_OBJECT_COLOR = '#f97316';

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Podkladové vrstvy",
+    "layerTypes": "base",
+    "defaultOpen": true,
+    "layers": [
+      {
+        "serverType": "tile",
+        "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "name": "OpenStreetMap",
+        "description": "Základní mapa OpenStreetMap",
+        "minZoom": 0,
+        "maxZoom": 19,
+        "active": true,
+        "opacity": 1
+      },
+      {
+        "serverType": "wms",
+        "url": "https://ags.cuzk.gov.cz/arcgis1/services/ORTOFOTO/MapServer/WMSServer",
+        "name": "ORTO",
+        "description": "ORTOFOTO mapa České republiky.",
+        "minZoom": 0,
+        "maxZoom": 19,
+        "active": false,
+        "opacity": 1,
+        "layers": ["0"],
+        "wmsFormat": "image/png"
+      }
+    ]
+  },
+  {
+    "name": "Katastrální území",
+    "layerTypes": "additional",
+    "defaultOpen": true,
+    "layers": [
+      {
+        "serverType": "wms",
+        "url": "https://services.cuzk.cz/wms/local-ux-wms.asp",
+        "name": "Obce",
+        "description": "Základní mapa OpenStreetMap",
+        "minZoom": 0,
+        "maxZoom": 19,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": ["AU.4thOrder.Obec"]
+      }
+    ]
+  }
+]

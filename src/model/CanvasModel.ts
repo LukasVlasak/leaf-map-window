@@ -2,7 +2,7 @@ import {fabric} from "fabric";
 import type CanvasView from "../view/components/Canvas/CanvasView";
 import type {IEvent} from "fabric/fabric-impl";
 import L, {type LatLngBoundsExpression} from "leaflet";
-import MapObject from "./MapObject";
+import MapObject from "../objects/MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
 import type MapObjectsModel from "./MapObjectsModel";
 

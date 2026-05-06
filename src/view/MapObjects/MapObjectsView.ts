@@ -1,4 +1,4 @@
-import type MapObject from "../../model/MapObject";
+import type MapObject from "../../objects/MapObject";
 import LeafButton from "../components/Button/LeafButton";
 import LeafInput from "../components/Input/LeafInput";
 import LeafSlider from "../components/Slider/LeafSlider";
