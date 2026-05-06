@@ -45,7 +45,8 @@ export default class MapObjectsModel {
             object.layer.openPopup();
         }
 
-        object.layer.on('click', () => {
+        object.layer.on('click', (e) => {
+            L.DomEvent.stopPropagation(e);
             this.selectObject(object);
         });
 
