@@ -1,17 +1,17 @@
 import * as L from "leaflet";
 import "leaflet-draw";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
-import {type LeafletMouseEvent, polyline} from "leaflet";
+import {type LatLng, type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
 import MapObject, {type LeafObjType} from "../objects/MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
 import type MapObjectsModel from "./MapObjectsModel";
-import type ObjectStore from "../store/ObjectStore";
 
+type geoJSONGemoetryType = "LineString" | "Polygon";
 export interface GeoJSONExportFeature {
     type: "Feature";
     geometry: {
-        type: "LineString" | "Polygon";
+        type: geoJSONGemoetryType;
         coordinates: number[][] | number[][][];
     };
     properties: {
@@ -35,18 +35,19 @@ interface GeoJSONExportObject {
     features: GeoJSONExportFeature[];
 }
 
-const POLYGON_DRAW_OPTIONS = {
+export const POLYGON_DRAW_OPTIONS = {
     selectable: false,
     interactive: false,
     showLength: false,
     shapeOptions: {
         color: DEFAULT_EDIT_COLORS[0],
         weight: 2,
-        opacity: 1
+        opacity: 1,
+        fillOpacity: 1
     }
 };
 
-const POLYLINE_DRAW_OPTIONS = {
+export const POLYLINE_DRAW_OPTIONS = {
     selectable: false,
     interactive: false,
     showLength: false,
@@ -71,12 +72,11 @@ interface Drawer {
 }
 
 export default class LeftSidebarModel {
-    private _mapLayersModel: MapObjectsModel;
+    private _mapObjectsModel: MapObjectsModel;
     private _leftSidebarView: LeftSidebarView;
     private _map: L.Map;
     private _element: string;
     private _canvasModel: CanvasModel;
-    private _objectStore: ObjectStore;
 
     private _drawers: Drawer[] = [];
 
@@ -85,13 +85,12 @@ export default class LeftSidebarModel {
     private _freedrawLine: L.Polyline | null = null;
     private _freedrawDelay: number = FREEDRAW_DELAY;
 
-    constructor(mapLayersModel: MapObjectsModel, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel, objectStore: ObjectStore) {
-        this._mapLayersModel = mapLayersModel;
+    constructor(mapObjectsModel: MapObjectsModel, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel) {
+        this._mapObjectsModel = mapObjectsModel;
         this._leftSidebarView = leftSidebarView;
         this._map = map;
         this._element = element;
         this._canvasModel = canvasModel;
-        this._objectStore = objectStore;
 
         this._initListeners();
         this._initDrawers();
@@ -111,6 +110,7 @@ export default class LeftSidebarModel {
         this._leftSidebarView.onFreedrawClick(this._onFreedrawClick.bind(this));
         this._leftSidebarView.onCanvasClick(this._onCanvasClick.bind(this));
         this._leftSidebarView.onExportClick(this._onExportClick.bind(this));
+        this._leftSidebarView.onImportClick(this._onImportClick.bind(this));
 
         this._canvasModel.bindOnCanvasSaveButton(this._onCanvasSave.bind(this));
         this._canvasModel.bindOnCanvasCloseButton(this._onCanvasClose.bind(this));
@@ -132,11 +132,48 @@ export default class LeftSidebarModel {
             }
 
             const options = layer.options as L.PathOptions;
-            this._mapLayersModel.addObject(new MapObject(coordinates, layer, type, options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
+            const mapObj = new MapObject(coordinates, layer, type, options.opacity ? options.opacity : 1, undefined, undefined, options.color, options.weight);
+            mapObj.setDefaultPopup();
+            this._mapObjectsModel.addObject(mapObj);
 
             this._disableDrawers();
             this._leftSidebarView.deactivateToolBtns();
         });
+    }
+
+    private _onImportClick(jsonString: string) {
+        const json = JSON.parse(jsonString);
+        for (const feature of json.features) {
+            const geoJsonObjType: geoJSONGemoetryType = feature.geometry.type;
+            let leafObjType: LeafObjType;
+
+            if (geoJsonObjType === "Polygon" && feature.properties.fabricCanvasData) {
+                leafObjType = "canvas";
+            } else if (geoJsonObjType === "Polygon") {
+                leafObjType = "polygon";
+            } else if (geoJsonObjType === "LineString") {
+                leafObjType = "polyline";
+            }
+
+            let coordinates: L.LatLng[] | L.LatLng[][];
+            if (geoJsonObjType === "LineString") {
+                coordinates = (feature.geometry.coordinates as number[][]).map(([lng, lat]) => L.latLng(lat!, lng!));
+            } else {
+                coordinates = (feature.geometry.coordinates as number[][][]).map(c =>
+                    c.map(([lng, lat]) => L.latLng(lat!, lng!))
+                );
+            }
+
+
+            // @ts-ignore
+            if (leafObjType === "canvas") {
+                // added to the mapObjectsModel within the method
+                this._canvasModel.loadCanvasContent(JSON.parse(feature.properties.fabricCanvasData), coordinates as LatLng[][]);
+            } else {
+                const newMapObject = new MapObject(coordinates, undefined, leafObjType!, feature.properties.opacity, feature.properties.name, feature.properties.description, feature.properties.color, feature.properties.strokeWidth, feature.properties.popup);
+                this._mapObjectsModel.addObject(newMapObject);
+            }
+        }
     }
 
     private _onExportClick() {
@@ -147,7 +184,7 @@ export default class LeftSidebarModel {
             ]
         };
 
-        for (const mapObject of this._objectStore.mapObjects) {
+        for (const mapObject of this._mapObjectsModel.getMapObjects()) {
             geoJson.features.push(mapObject.toGeoJSON());
         }
 
@@ -229,7 +266,9 @@ export default class LeftSidebarModel {
 
         const line = this._freedrawLine!;
         const options = line.options as L.PathOptions;
-        this._mapLayersModel.addObject(new MapObject(line.getLatLngs() as L.LatLng[], line, "polyline", options.opacity ? options.opacity * 100 : 100, undefined, undefined, options.color, options.weight));
+        const freedrawObj = new MapObject(line.getLatLngs() as L.LatLng[], line, "polyline", options.opacity ? options.opacity : 1, undefined, undefined, options.color, options.weight);
+        freedrawObj.setDefaultPopup();
+        this._mapObjectsModel.addObject(freedrawObj);
         setTimeout(() => { if (line.getPopup()) line.openPopup(); }, 0);
 
         this._disableDrawers();

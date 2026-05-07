@@ -35,7 +35,7 @@ export default class LeftSidebarView extends HTMLElement {
         const secondGroup = document.createElement('div');
         secondGroup.className = 'tool-group';
 
-        this._importBtn = new LeafButton('Import dat (GeoJSON, KML…)', 'Import', 'fa fa-download');
+        this._importBtn = new LeafButton('Import dat (GeoJSON)', 'Import', 'fa fa-download');
         this._exportBtn = new LeafButton('Export objektů', 'Export', 'fa fa-upload');
 
         secondGroup.appendChild(this._importBtn);
@@ -55,8 +55,28 @@ export default class LeftSidebarView extends HTMLElement {
     onCanvasClick(handler: () => void) {
         this._canvasBtn!.addEventListener('click', handler);
     }
-    onImportClick(handler: () => void) {
-        this._importBtn!.addEventListener('click', handler);
+    onImportClick(handler: (json: string) => void) {
+        this._importBtn!.addEventListener('click', () => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = ".json,.geojson,application/json,application/geo+json";
+            fileInput.style.display = 'none';
+            this.appendChild(fileInput);
+
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files?.[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    handler(e.target!.result as string);
+                    this.removeChild(fileInput);
+                };
+                reader.readAsText(file);
+            });
+
+            fileInput.click();
+        });
     }
     onExportClick(handler: () => void) {
         this._exportBtn!.addEventListener('click', handler);

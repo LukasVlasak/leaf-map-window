@@ -1,6 +1,9 @@
 import L, {type LatLng, type LatLngBoundsExpression} from "leaflet";
 import Utils from "../utils/Utils";
-import type {GeoJSONExportFeature} from "../model/LeftSidebarModel";
+import {
+    type GeoJSONExportFeature,
+    POLYLINE_DRAW_OPTIONS
+} from "../model/LeftSidebarModel";
 
 type LeafLayer = L.Polyline | L.Polygon | L.ImageOverlay;
 export type LeafObjType = "polygon" | "polyline" | "canvas";
@@ -10,6 +13,7 @@ export default class MapObject {
     // @ts-ignore
     private _name: string;
     private _coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][];
+    // @ts-ignore
     private _layer: LeafLayer;
     private _type: LeafObjType;
     private _distance?: number = undefined;
@@ -20,51 +24,56 @@ export default class MapObject {
     private _strokeWidth?: number = undefined;
     private _popup?: string = undefined;
     // 0 - 100
-    private _opacity: number = 100;
+    private _opacity: number = 1;
     private _fabricCanvasContent?: string = undefined; // for export
 
-    constructor(coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][], layer: LeafLayer, type: LeafObjType, opacity?: number, name?: string, description?: string, color?: string, strokeWidth?: number, popup?: string) {
+    constructor(coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][], layer: LeafLayer | undefined, type: LeafObjType, opacity?: number, name?: string, description?: string, color?: string, strokeWidth?: number, popup?: string) {
         this._ID = crypto.randomUUID();
         this._coordinates = coordinates;
-        this._layer = layer;
         this._type = type;
-        this._calculateMeasurement();
-        if (name) {
-            this.name = name;
-        } else {
-            this.name = type;
-        }
+        this._name = name ?? type;
         if (opacity) {
-            this.opacity = opacity;
+            this._opacity = opacity;
         }
-        if (description) {
-            this.description = description;
+        this._description = description;
+        this._color = color;
+        this._strokeWidth = strokeWidth;
+        if (layer) {
+            this._layer = layer;
+        } else {
+            this._bindLeafletLayer();
         }
-        // color and strokeWidth of canvas is set as layer.getElement().style
-        // getElement() is not present now - instead a default CSS class exists that set these props to the element (.default-canvas-class)
-        if (color) {
-            if (type !== "canvas") {
-                this.color = color;
-            } else {
-                this._color = color;
-            }
-        }
-        if (strokeWidth) {
-            if (type !== "canvas") {
-                this.strokeWidth = strokeWidth;
-            } else {
-                this._strokeWidth = strokeWidth;
-            }
-        }
+        this._calculateMeasurement();
 
         if (popup) {
             this.popup = popup;
-        } else {
-            this._setDefaultPopup();
         }
     }
 
-    private _setDefaultPopup() {
+    private _bindLeafletLayer() {
+        if (this.type === "polyline") {
+            // @ts-ignore
+            this.layer = L.polyline(this.coordinates as LatLng[], {
+                color: this.color ?? POLYLINE_DRAW_OPTIONS.shapeOptions.color,
+                weight: this.strokeWidth ?? POLYLINE_DRAW_OPTIONS.shapeOptions.weight,
+                opacity: this.opacity ?? POLYLINE_DRAW_OPTIONS.shapeOptions.opacity,
+            });
+        }
+
+        if (this.type === "polygon") {
+            this.layer = L.polygon(this.coordinates as LatLng[][], {
+                color: this.color ?? POLYLINE_DRAW_OPTIONS.shapeOptions.color,
+                fillColor: this.color ?? POLYLINE_DRAW_OPTIONS.shapeOptions.color,
+                weight: this.strokeWidth ?? POLYLINE_DRAW_OPTIONS.shapeOptions.weight,
+                opacity: this.opacity ?? POLYLINE_DRAW_OPTIONS.shapeOptions.opacity,
+                fillOpacity: this.opacity ?? POLYLINE_DRAW_OPTIONS.shapeOptions.opacity,
+            });
+        }
+
+        // canvas layer is created by CanvasModel.loadCanvasContent
+    }
+
+    setDefaultPopup() {
         if (this._circuit && this._area) {
             this.popup = `<b>Obsah:</b> ${Utils.formatArea(this._area)}<br><b>Obvod:</b> ${Utils.formatDistance(this._circuit)}`;
         } else if (this._distance) {
@@ -110,6 +119,10 @@ export default class MapObject {
 
     get coordinates(): LatLngBoundsExpression | LatLng[] | LatLng[][] {
         return this._coordinates;
+    }
+
+    set layer(layer: LeafLayer) {
+        this._layer = layer;
     }
 
     get layer(): LeafLayer {

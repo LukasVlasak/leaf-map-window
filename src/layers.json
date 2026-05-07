@@ -6,9 +6,9 @@
     "layers": [
       {
         "serverType": "wms",
-        "url": "https://ags.cuzk.gov.cz/arcgis1/services/ORTOFOTO/MapServer/WMSServer",
-        "name": "ORTO",
-        "description": "ORTOFOTO mapa České republiky.",
+        "url": "https://ags.cuzk.gov.cz/arcgis1/services/ZTM/MapServer/WMSServer",
+        "name": "ZTM",
+        "description": "Základní topografická mapa České republiky.",
         "minZoom": 0,
         "maxZoom": 14,
         "active": true,
@@ -22,9 +22,9 @@
       },
       {
         "serverType": "wms",
-        "url": "https://ags.cuzk.gov.cz/arcgis1/services/ZTM/MapServer/WMSServer",
-        "name": "ZTM",
-        "description": "Základní topografická mapa České republiky.",
+        "url": "https://ags.cuzk.gov.cz/arcgis1/services/ORTOFOTO/MapServer/WMSServer",
+        "name": "ORTO",
+        "description": "ORTOFOTO mapa České republiky.",
         "minZoom": 0,
         "maxZoom": 14,
         "active": false,

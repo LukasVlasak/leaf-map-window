@@ -1,6 +1,7 @@
 import type MapObjectsView from "../view/MapObjects/MapObjectsView";
 import type MapObject from "../objects/MapObject";
 import type ObjectStore from "../store/ObjectStore";
+import L from "leaflet";
 
 const SELECTED_OBJECT_COLOR = '#f97316';
 
@@ -36,6 +37,10 @@ export default class MapObjectsModel {
                 this.deselectObject();
             }
         });
+    }
+
+    getMapObjects() {
+        return this._objectStore.mapObjects;
     }
 
     addObject(object: MapObject) {

@@ -1,7 +1,7 @@
 import {fabric} from "fabric";
 import type CanvasView from "../view/components/Canvas/CanvasView";
 import type {IEvent} from "fabric/fabric-impl";
-import L, {type LatLngBoundsExpression} from "leaflet";
+import L, {LatLngBounds, type LatLngBoundsExpression} from "leaflet";
 import MapObject from "../objects/MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
 import type MapObjectsModel from "./MapObjectsModel";
@@ -28,14 +28,14 @@ const DEFAULT_POLYGON_OPTIONS = {
 const DEFAULT_LINE_OPTIONS = {
     stroke: '#000',
     // have to specify otherwise obj.get('fill') is not falsy
-    fill: undefined,
+    fill: null,
     strokeWidth: 3,
     id: 'line'
 }
 
 const DEFAULT_POLYLINE_OPTIONS = {
     stroke: '#000',
-    fill: undefined,
+    fill: null,
     strokeWidth: 3,
     objectCaching: false,
     selectable: false,
@@ -75,7 +75,7 @@ export type DrawType = "circle" | "polygon" | "line" | "polyline" | "point" | "t
 export default class CanvasModel {
     private _fabricCanvas;
 
-    private _mapLayersModel: MapObjectsModel;
+    private _mapObjectsModel: MapObjectsModel;
     private _canvasView: CanvasView;
     private _map: L.Map;
 
@@ -90,10 +90,10 @@ export default class CanvasModel {
     private _polyLineTempLine: fabric.Line | undefined = undefined;
     private _polyLinePointMarkers: fabric.Rect[] = [];
 
-    constructor(mapLayersModel: MapObjectsModel, canvasView: CanvasView, map: L.Map) {
+    constructor(mapObjectsModel: MapObjectsModel, canvasView: CanvasView, map: L.Map) {
         this._fabricCanvas = new fabric.Canvas('canvas');
 
-        this._mapLayersModel = mapLayersModel;
+        this._mapObjectsModel = mapObjectsModel;
         this._canvasView = canvasView;
         this._map = map;
 
@@ -218,6 +218,8 @@ export default class CanvasModel {
                 });
                 break;
             case "line":
+                // ts-ignore because fill is null - typescript accepts only undefined but i cannot be undefined because after import it would be displayed as rectangle
+                // @ts-ignore
                 this._currDrawObject = new fabric.Line([startX, startY, startX, startY], DEFAULT_LINE_OPTIONS);
                 break;
             case "point":
@@ -284,6 +286,8 @@ export default class CanvasModel {
         this._polyLinePoints.push({ x: startX, y: startY });
 
         if (!this._polyline) {
+            // ts-ignore because fill is null - typescript accepts only undefined but i cannot be undefined because after import it would be displayed as rectangle
+            // @ts-ignore
             this._polyline = new fabric.Polyline(this._polyLinePoints, DEFAULT_POLYLINE_OPTIONS);
             this._polyLineTempLine = new fabric.Line([startX, startY, startX, startY], {
                 stroke: DEFAULT_POLYLINE_OPTIONS.stroke,
@@ -439,17 +443,46 @@ export default class CanvasModel {
         this._fabricCanvas.renderAll();
     }
 
-    onCanvasSave() {
+    /**
+     * canvasContent is:
+     * JSON.stringify({
+     *      ...this._fabricCanvas.toJSON(['id']),
+     *      height: this._fabricCanvas.getHeight(),
+     *      width: this._fabricCanvas.getWidth(),
+     *      zoom: this._map.getZoom()
+     * });
+     */
+    loadCanvasContent(canvasContent: any, coordinates: L.LatLng[][]) {
+        this._fabricCanvas.loadFromJSON(canvasContent, () => {
+            this._fabricCanvas.setWidth(canvasContent.width);
+            this._fabricCanvas.setHeight(canvasContent.height);
+            this._fabricCanvas.renderAll();
+
+            this.onCanvasSave(coordinates);
+            this.onCanvasClose();
+        });
+    }
+
+    onCanvasSave(predefinedCoords?: L.LatLng[][]) {
         const url = this._fabricCanvas.toDataURL({ format: 'png' });
 
-        const coordinates = this._getCanvasCoordinates();
-        const img = new L.ImageOverlay(url, coordinates, {
+        let coords;
+        if (!predefinedCoords) {
+            coords = this._getCanvasCoordinates();
+        } else {
+            coords = new LatLngBounds(predefinedCoords[0]!);
+        }
+        const img = new L.ImageOverlay(url, coords, {
             alt:  'Uložené canvas plátno',
             className: 'default-canvas-class',
             opacity: 1,
             interactive: true,
         });
-        const canvasObj = new MapObject(coordinates, img, "canvas", img.options.opacity! * 100, undefined, undefined, DEFAULT_EDIT_COLORS[5], 1);
+        const canvasObj = new MapObject(coords, img, "canvas", img.options.opacity!, undefined, undefined, DEFAULT_EDIT_COLORS[5], 1);
+        if (!predefinedCoords) {
+            // drawed canvas not imported
+            canvasObj.setDefaultPopup();
+        }
 
         // for export
         canvasObj.fabricCanvasContent = this._fabricCanvas.getObjects().length > 0 ? JSON.stringify({
@@ -459,7 +492,7 @@ export default class CanvasModel {
             zoom: this._map.getZoom()
         }) : '';
 
-        this._mapLayersModel.addObject(canvasObj);
+        this._mapObjectsModel.addObject(canvasObj);
     }
 
     _getCanvasCoordinates(): LatLngBoundsExpression {
