@@ -26,7 +26,7 @@ export interface GeoJSONExportFeature {
         area?: number;
         circuit?: number;
         popup?: string;
-        imageData?: string; // base64
+        fabricCanvasData?: string;
     };
 }
 

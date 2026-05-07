@@ -21,6 +21,7 @@ export default class MapObject {
     private _popup?: string = undefined;
     // 0 - 100
     private _opacity: number = 100;
+    private _fabricCanvasContent?: string = undefined; // for export
 
     constructor(coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][], layer: LeafLayer, type: LeafObjType, opacity?: number, name?: string, description?: string, color?: string, strokeWidth?: number, popup?: string) {
         this._ID = crypto.randomUUID();
@@ -205,6 +206,14 @@ export default class MapObject {
         this.layer.setStyle({opacity: this.opacity, fillOpacity: this.opacity});
     }
 
+    set fabricCanvasContent(content: string) {
+        this._fabricCanvasContent = content;
+    }
+
+    get fabricCanvasContent(): string | undefined {
+        return this._fabricCanvasContent;
+    }
+
     toGeoJSON(): GeoJSONExportFeature {
         const properties = {
             id: this.ID,
@@ -266,7 +275,7 @@ export default class MapObject {
                 },
                 properties: {
                     ...properties,
-                    imageData: (this.layer as L.ImageOverlay).getElement()!.src
+                    fabricCanvasData: this.fabricCanvasContent
                 }
             };
         }

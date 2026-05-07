@@ -450,6 +450,15 @@ export default class CanvasModel {
             interactive: true,
         });
         const canvasObj = new MapObject(coordinates, img, "canvas", img.options.opacity! * 100, undefined, undefined, DEFAULT_EDIT_COLORS[5], 1);
+
+        // for export
+        canvasObj.fabricCanvasContent = this._fabricCanvas.getObjects().length > 0 ? JSON.stringify({
+            ...this._fabricCanvas.toJSON(['id']),
+            height: this._fabricCanvas.getHeight(),
+            width: this._fabricCanvas.getWidth(), 
+            zoom: this._map.getZoom()
+        }) : '';
+
         this._mapLayersModel.addObject(canvasObj);
     }
 
