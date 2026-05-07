@@ -455,7 +455,7 @@ export default class CanvasModel {
         canvasObj.fabricCanvasContent = this._fabricCanvas.getObjects().length > 0 ? JSON.stringify({
             ...this._fabricCanvas.toJSON(['id']),
             height: this._fabricCanvas.getHeight(),
-            width: this._fabricCanvas.getWidth(), 
+            width: this._fabricCanvas.getWidth(),
             zoom: this._map.getZoom()
         }) : '';
 
@@ -472,18 +472,11 @@ export default class CanvasModel {
         const overlayBottom = overlayTop + overlayRect.height;
 
         const topLeft = this._map.containerPointToLatLng([overlayLeft, overlayTop]);
-        const topRight = this._map.containerPointToLatLng([overlayRight, overlayTop]);
-        const bottomLeft = this._map.containerPointToLatLng([overlayLeft, overlayBottom]);
         const bottomRight = this._map.containerPointToLatLng([overlayRight, overlayBottom]);
 
         return new L.LatLngBounds(
-            [
-                [topLeft.lat, topLeft.lng],
-                [topRight.lat, topRight.lng],
-                [bottomRight.lat, bottomRight.lng],
-                [bottomLeft.lat, bottomLeft.lng],
-                [topLeft.lat, topLeft.lng]
-            ]
+            [topLeft.lat, topLeft.lng],
+            [bottomRight.lat, bottomRight.lng]
         );
     }
 
