@@ -3,9 +3,37 @@ import "leaflet-draw";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
 import {type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
-import MapObject from "../objects/MapObject";
+import MapObject, {type LeafObjType} from "../objects/MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
 import type MapObjectsModel from "./MapObjectsModel";
+import type ObjectStore from "../store/ObjectStore";
+
+export interface GeoJSONExportFeature {
+    type: "Feature";
+    geometry: {
+        type: "LineString" | "Polygon";
+        coordinates: number[][] | number[][][];
+    };
+    properties: {
+        id: string;
+        name: string;
+        type: LeafObjType;
+        description?: string;
+        color?: string;
+        strokeWidth?: number;
+        opacity: number;
+        distance?: number;
+        area?: number;
+        circuit?: number;
+        popup?: string;
+        imageData?: string; // base64
+    };
+}
+
+interface GeoJSONExportObject {
+    type: "FeatureCollection";
+    features: GeoJSONExportFeature[];
+}
 
 const POLYGON_DRAW_OPTIONS = {
     selectable: false,
@@ -48,6 +76,7 @@ export default class LeftSidebarModel {
     private _map: L.Map;
     private _element: string;
     private _canvasModel: CanvasModel;
+    private _objectStore: ObjectStore;
 
     private _drawers: Drawer[] = [];
 
@@ -56,12 +85,13 @@ export default class LeftSidebarModel {
     private _freedrawLine: L.Polyline | null = null;
     private _freedrawDelay: number = FREEDRAW_DELAY;
 
-    constructor(mapLayersModel: MapObjectsModel, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel) {
+    constructor(mapLayersModel: MapObjectsModel, leftSidebarView: LeftSidebarView, map: L.Map, element: string, canvasModel: CanvasModel, objectStore: ObjectStore) {
         this._mapLayersModel = mapLayersModel;
         this._leftSidebarView = leftSidebarView;
         this._map = map;
         this._element = element;
         this._canvasModel = canvasModel;
+        this._objectStore = objectStore;
 
         this._initListeners();
         this._initDrawers();
@@ -80,6 +110,7 @@ export default class LeftSidebarModel {
         this._leftSidebarView.onPolylineClick(this._onPolylineClick.bind(this));
         this._leftSidebarView.onFreedrawClick(this._onFreedrawClick.bind(this));
         this._leftSidebarView.onCanvasClick(this._onCanvasClick.bind(this));
+        this._leftSidebarView.onExportClick(this._onExportClick.bind(this));
 
         this._canvasModel.bindOnCanvasSaveButton(this._onCanvasSave.bind(this));
         this._canvasModel.bindOnCanvasCloseButton(this._onCanvasClose.bind(this));
@@ -106,6 +137,25 @@ export default class LeftSidebarModel {
             this._disableDrawers();
             this._leftSidebarView.deactivateToolBtns();
         });
+    }
+
+    private _onExportClick() {
+        const geoJson: GeoJSONExportObject = {
+            type: "FeatureCollection",
+            features: [
+
+            ]
+        };
+
+        for (const mapObject of this._objectStore.mapObjects) {
+            geoJson.features.push(mapObject.toGeoJSON());
+        }
+
+        const blob = new Blob([JSON.stringify(geoJson)], {
+            type: "application/json",
+        });
+
+        this._leftSidebarView.downloadJSONFile(blob, "leaf-objects-export.json");
     }
 
     _switchActiveDrawer(caller: "polygon" | "polyline" | "freedraw" | "canvas") {

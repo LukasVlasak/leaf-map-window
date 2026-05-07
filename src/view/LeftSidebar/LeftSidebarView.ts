@@ -62,6 +62,21 @@ export default class LeftSidebarView extends HTMLElement {
         this._exportBtn!.addEventListener('click', handler);
     }
 
+    downloadJSONFile(blob: Blob, filename: string) {
+        const file = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = file;
+        link.download = filename;
+        link.style.display = 'none';
+        this.appendChild(link);
+
+        link.click();
+
+        this.removeChild(link);
+        URL.revokeObjectURL(file);
+    }
+
     toggleToolBtnState(type: "polygon" | "polyline" | "freedraw" | "canvas") {
         switch (type) {
             case "polygon":

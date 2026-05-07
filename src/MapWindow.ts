@@ -58,7 +58,7 @@ export default class MapWindow {
 
         const leftSideBarView = new LeftSidebarView();
         container.appendChild(leftSideBarView);
-        new LeftSidebarModel(mapObjectsModel, leftSideBarView, this.map, this.element, canvasModel);
+        new LeftSidebarModel(mapObjectsModel, leftSideBarView, this.map, this.element, canvasModel, objectStore);
 
         const mapControlView = new MapControlView();
         container.appendChild(mapControlView);

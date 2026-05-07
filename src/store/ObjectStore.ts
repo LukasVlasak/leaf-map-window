@@ -1,4 +1,4 @@
-import {featureGroup} from "leaflet";
+import L, {featureGroup} from "leaflet";
 import type MapObject from "../objects/MapObject";
 
 export default class ObjectStore {
@@ -22,5 +22,9 @@ export default class ObjectStore {
     removeAll() {
         this._mapObjects = [];
         this._mapObjectLayer.clearLayers();
+    }
+
+    get mapObjects(): MapObject[] {
+        return this._mapObjects;
     }
 }

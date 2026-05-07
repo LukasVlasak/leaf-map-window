@@ -1,8 +1,9 @@
 import L, {type LatLng, type LatLngBoundsExpression} from "leaflet";
 import Utils from "../utils/Utils";
+import type {GeoJSONExportFeature} from "../model/LeftSidebarModel";
 
 type LeafLayer = L.Polyline | L.Polygon | L.ImageOverlay;
-type LeafObjType = "polygon" | "polyline" | "canvas";
+export type LeafObjType = "polygon" | "polyline" | "canvas";
 
 export default class MapObject {
     private _ID: string;
@@ -202,5 +203,72 @@ export default class MapObject {
     set opacity(value: number) {
         this._opacity = value / 100;
         this.layer.setStyle({opacity: this.opacity, fillOpacity: this.opacity});
+    }
+
+    toGeoJSON(): GeoJSONExportFeature {
+        const properties = {
+            id: this.ID,
+            name: this.name,
+            type: this.type,
+            description: this.description,
+            color: this.color,
+            strokeWidth: this.strokeWidth,
+            opacity: this.opacity,
+            distance: this.distance,
+            area: this.area,
+            circuit: this.circuit,
+            popup: this.popup,
+        };
+
+        if (this.type === "polyline") {
+            const latlng = (this.layer as L.Polyline).getLatLngs() as LatLng[];
+
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "LineString",
+                    coordinates: latlng.map((ll) => [ll.lng, ll.lat])
+                },
+                properties,
+            };
+        } else if (this.type === "polygon") {
+            const latlng = (this.layer as L.Polygon).getLatLngs() as LatLng[][];
+
+            const coordinates = latlng.map((ll) => {
+                return ll.map((l) => [l.lng, l.lat]);
+            });
+
+            // uzavrit polygon
+            coordinates[0]!.push(coordinates[0]![0]!);
+
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "Polygon",
+                    coordinates: coordinates
+                },
+                properties,
+            };
+        } else {
+            // canvas
+            const latlng = (this.layer as L.ImageOverlay).getBounds();
+
+            const southWest = latlng.getSouthWest();
+            const soutEast = latlng.getSouthEast();
+            const northWest = latlng.getNorthWest();
+            const northEast = latlng.getNorthEast();
+
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "Polygon",
+                    coordinates: [[[southWest.lng, southWest.lat], [soutEast.lng, soutEast.lat], [northEast.lng, northEast.lat], [northWest.lng, northWest.lat], [southWest.lng, southWest.lat]]]
+                },
+                properties: {
+                    ...properties,
+                    imageData: (this.layer as L.ImageOverlay).getElement()!.src
+                }
+            };
+        }
     }
 }
