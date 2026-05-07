@@ -93,7 +93,14 @@
     .panel-section-head {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 14px 16px 8px;
+      cursor: pointer;
+      transition: background vars.$transition;
+
+      &:hover { background: vars.$bgSurfaceMuted; }
+
+      &.collapsed .panel-section-toggle { transform: rotate(180deg); }
 
       .panel-section-title {
         font-size: 11px;
@@ -102,6 +109,20 @@
         color: vars.$mutedTextColor;
         font-weight: 600;
       }
+
+      .panel-section-toggle {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: vars.$mutedTextColor;
+        transition: transform vars.$transitionFast;
+      }
+    }
+
+    .panel-group-body {
+      &.collapsed { display: none; }
     }
 
     .layer {
@@ -110,11 +131,11 @@
       transition: background vars.$transition;
 
       &:first-of-type { border-top: 0; }
-      &.hidden-layer { opacity: 0.55; }
+      &.hidden-layer { opacity: 0.65; }
 
       &.expanded {
         .layer-toggle i { transform: rotate(180deg); }
-        .layer-detail { max-height: 240px; }
+        .layer-detail { max-height: 300px; overflow-y: scroll }
       }
 
       .layer-head {
@@ -129,8 +150,8 @@
         }
 
         .layer-check {
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           flex-shrink: 0;
           border-radius: 5px;
           border: 1.5px solid vars.$borderStrong;
@@ -139,7 +160,7 @@
           justify-content: center;
           color: white;
           cursor: pointer;
-          padding: 5px;
+          padding: 4px;
           box-sizing: content-box;
           transition: background vars.$transition, border-color vars.$transition;
 
@@ -184,6 +205,11 @@
         }
       }
 
+      .layer-info {
+        margin-top: 5px;
+        margin-bottom: 10px;
+      }
+
       .layer-detail {
         max-height: 0;
         overflow: hidden;
@@ -193,7 +219,19 @@
           font-size: 12.5px;
           color: vars.$secondaryTextColor;
           line-height: 1.5;
-          margin: 10px 0 8px 30px;
+          margin: 10px 0 4px 30px;
+        }
+
+        .layer-attribution {
+          font-size: 11px;
+          color: vars.$mutedTextColor;
+          margin: 6px 0 4px 30px;
+
+          a {
+            color: vars.$mutedTextColor;
+            text-decoration: underline;
+            &:hover { color: vars.$primaryColor; }
+          }
         }
 
         .layer-detail-row {
@@ -203,8 +241,8 @@
           margin: 4px 0 4px 30px;
 
           .layer-detail-label {
-            font-size: 11px;
-            color: vars.$mutedTextColor;
+            font-size: 12px;
+            color: black;
             min-width: 80px;
           }
 
@@ -215,6 +253,7 @@
 
           leaf-slider {
             flex: 1;
+            min-width: 0;
           }
         }
       }

@@ -5,45 +5,577 @@
     "defaultOpen": true,
     "layers": [
       {
-        "serverType": "tile",
-        "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "name": "OpenStreetMap",
-        "description": "Základní mapa OpenStreetMap",
-        "minZoom": 0,
-        "maxZoom": 19,
-        "active": true,
-        "opacity": 1
-      },
-      {
         "serverType": "wms",
         "url": "https://ags.cuzk.gov.cz/arcgis1/services/ORTOFOTO/MapServer/WMSServer",
         "name": "ORTO",
         "description": "ORTOFOTO mapa České republiky.",
         "minZoom": 0,
-        "maxZoom": 19,
+        "maxZoom": 14,
+        "active": true,
+        "opacity": 1,
+        "layers": [
+          "0"
+        ],
+        "wmsFormat": "image/png",
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://ags.cuzk.gov.cz/arcgis1/services/ZTM/MapServer/WMSServer",
+        "name": "ZTM",
+        "description": "Základní topografická mapa České republiky.",
+        "minZoom": 0,
+        "maxZoom": 14,
         "active": false,
         "opacity": 1,
-        "layers": ["0"],
-        "wmsFormat": "image/png"
+        "layers": [
+          "0"
+        ],
+        "wmsFormat": "image/png",
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
+        "name": "Stínovaný reliéf",
+        "description": "Digitální model reliéfu terénu ČR 5. generace – šedý stínovaný reliéf.",
+        "minZoom": 0,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 1,
+        "layers": [
+          "dmr5g:GrayscaleHillshade"
+        ],
+        "wmsFormat": "image/png",
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
+        "name": "Barevný stínovaný reliéf",
+        "description": "Digitální model reliéfu terénu ČR 5. generace – barevný stínovaný reliéf s výškovým tónováním.",
+        "minZoom": 0,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 1,
+        "layers": [
+          "dmr5g:TintedHillshadeContinuous"
+        ],
+        "wmsFormat": "image/png",
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
+        "name": "Výškový stínovaný reliéf)",
+        "description": "Digitální model reliéfu terénu ČR 5. generace – šedý stínovaný reliéf s 10násobným zdůrazněním výšek.",
+        "minZoom": 0,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 1,
+        "layers": [
+          "dmr5g:GrayscaleHillshadeZ10"
+        ],
+        "wmsFormat": "image/png",
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
       }
     ]
   },
   {
-    "name": "Katastrální území",
+    "name": "Územní správní jednotky",
     "layerTypes": "additional",
     "defaultOpen": true,
     "layers": [
       {
         "serverType": "wms",
-        "url": "https://services.cuzk.cz/wms/local-ux-wms.asp",
-        "name": "Obce",
-        "description": "Základní mapa OpenStreetMap",
-        "minZoom": 0,
-        "maxZoom": 19,
+        "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
+        "name": "Stát",
+        "description": "Státní hranice ČR – INSPIRE",
+        "minZoom": 3,
+        "maxZoom": 14,
         "active": false,
         "opacity": 1,
         "wmsFormat": "image/png",
-        "layers": ["AU.4thOrder.Obec"]
+        "layers": [
+          "AU.1stOrder.Stat"
+        ],
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
+        "name": "Kraje",
+        "description": "Kraje České republiky – INSPIRE",
+        "minZoom": 3,
+        "maxZoom": 11,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "AU.2ndOrder.Kraj"
+        ],
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
+        "name": "Okresy",
+        "description": "Okresy České republiky – INSPIRE",
+        "minZoom": 5,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "AU.3rdOrder.Okres"
+        ],
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
+        "name": "Obce",
+        "description": "Obce České republiky – INSPIRE",
+        "minZoom": 6,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "AU.4thOrder.Obec"
+        ],
+        "attribution": "© Český úřad zeměměřický a katastrální (ČÚZK)",
+        "attributionLink": "https://geoportal.cuzk.cz"
+      }
+    ]
+  },
+  {
+    "name": "Hlukové mapy",
+    "layerTypes": "additional",
+    "defaultOpen": false,
+    "layers": [
+      {
+        "serverType": "wms",
+        "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Silnice_Ldvn/ImageServer/WMSServer",
+        "name": "Hlavní silnice – Ldvn",
+        "description": "Strategická hluková mapa 2022 – hlavní silnice mimo aglomerace. Hlukový indikátor Ldvn => den-večer-noc",
+        "minZoom": 2,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Ministerstvo zdravotnictví ČR",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px;line-height:1.6\"><strong>Legenda – Ldvn (den-večer-noc)</strong><div style=\"display:flex;align-items:center;gap:8px;margin-top:4px\"><span style=\"display:inline-block;width:22px;height:14px;background:#9FE9A1;border:1px solid #555\"></span>50–55 dB (nízká zátěž)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFFF66;border:1px solid #555\"></span>55–60 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFA500;border:1px solid #555\"></span>60–65 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FF3333;border:1px solid #555\"></span>65–70 dB (mezní hodnota)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#C71585;border:1px solid #555\"></span>70–75 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#4B0082;border:1px solid #555\"></span>&gt;75 dB (kritická zátěž)</div></div>",
+        "attributionLink": "https://geoportal.mzcr.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Zeleznice_Ldvn/ImageServer/WMSServer",
+        "name": "Hlavní železnice – Ldvn",
+        "description": "Strategická hluková mapa 2022 – hlavní železniční tratě mimo aglomerace. Hlukový indikátor Ldvn => den-večer-noc",
+        "minZoom": 2,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Ministerstvo zdravotnictví ČR",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px;line-height:1.6\"><strong>Legenda – Ldvn (den-večer-noc)</strong><div style=\"display:flex;align-items:center;gap:8px;margin-top:4px\"><span style=\"display:inline-block;width:22px;height:14px;background:#9FE9A1;border:1px solid #555\"></span>50–55 dB (nízká zátěž)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFFF66;border:1px solid #555\"></span>55–60 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFA500;border:1px solid #555\"></span>60–65 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FF3333;border:1px solid #555\"></span>65–70 dB (mezní hodnota)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#C71585;border:1px solid #555\"></span>70–75 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#4B0082;border:1px solid #555\"></span>&gt;75 dB (kritická zátěž)</div></div>",
+        "attributionLink": "https://geoportal.mzcr.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Letiste_Ldvn/ImageServer/WMSServer",
+        "name": "Letiště Praha Ruzyně – Ldvn",
+        "description": "Strategická hluková mapa 2022 – hlavní letiště Václava Havla Praha Ruzyně. Hlukový indikátor Ldvn => den-večer-noc",
+        "minZoom": 2,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Ministerstvo zdravotnictví ČR",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px;line-height:1.6\"><strong>Legenda – Ldvn (den-večer-noc)</strong><div style=\"display:flex;align-items:center;gap:8px;margin-top:4px\"><span style=\"display:inline-block;width:22px;height:14px;background:#9FE9A1;border:1px solid #555\"></span>50–55 dB (nízká zátěž)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFFF66;border:1px solid #555\"></span>55–60 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFA500;border:1px solid #555\"></span>60–65 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FF3333;border:1px solid #555\"></span>65–70 dB (mezní hodnota)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#C71585;border:1px solid #555\"></span>70–75 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#4B0082;border:1px solid #555\"></span>&gt;75 dB (kritická zátěž)</div></div>",
+        "attributionLink": "https://geoportal.mzcr.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Celek_Ldvn/ImageServer/WMSServer",
+        "name": "Aglomerace – celek – Ldvn",
+        "description": "Strategická hluková mapa 2022 – souhrnná hluková zátěž v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
+        "minZoom": 2,
+        "maxZoom": 13,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Ministerstvo zdravotnictví ČR",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px;line-height:1.6\"><strong>Legenda – Ldvn (den-večer-noc)</strong><div style=\"display:flex;align-items:center;gap:8px;margin-top:4px\"><span style=\"display:inline-block;width:22px;height:14px;background:#9FE9A1;border:1px solid #555\"></span>50–55 dB (nízká zátěž)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFFF66;border:1px solid #555\"></span>55–60 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFA500;border:1px solid #555\"></span>60–65 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FF3333;border:1px solid #555\"></span>65–70 dB (mezní hodnota)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#C71585;border:1px solid #555\"></span>70–75 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#4B0082;border:1px solid #555\"></span>&gt;75 dB (kritická zátěž)</div></div>",
+        "attributionLink": "https://geoportal.mzcr.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Silnice_Ldvn/ImageServer/WMSServer",
+        "name": "Aglomerace – silnice – Ldvn",
+        "description": "Strategická hluková mapa 2022 – silniční doprava v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
+        "minZoom": 2,
+        "maxZoom": 13,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Ministerstvo zdravotnictví ČR",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px;line-height:1.6\"><strong>Legenda – Ldvn (den-večer-noc)</strong><div style=\"display:flex;align-items:center;gap:8px;margin-top:4px\"><span style=\"display:inline-block;width:22px;height:14px;background:#9FE9A1;border:1px solid #555\"></span>50–55 dB (nízká zátěž)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFFF66;border:1px solid #555\"></span>55–60 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFA500;border:1px solid #555\"></span>60–65 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FF3333;border:1px solid #555\"></span>65–70 dB (mezní hodnota)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#C71585;border:1px solid #555\"></span>70–75 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#4B0082;border:1px solid #555\"></span>&gt;75 dB (kritická zátěž)</div></div>",
+        "attributionLink": "https://geoportal.mzcr.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Zeleznice_Ldvn/ImageServer/WMSServer",
+        "name": "Aglomerace – železnice – Ldvn",
+        "description": "Strategická hluková mapa 2022 – železniční doprava v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
+        "minZoom": 2,
+        "maxZoom": 13,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Ministerstvo zdravotnictví ČR",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px;line-height:1.6\"><strong>Legenda – Ldvn (den-večer-noc)</strong><div style=\"display:flex;align-items:center;gap:8px;margin-top:4px\"><span style=\"display:inline-block;width:22px;height:14px;background:#9FE9A1;border:1px solid #555\"></span>50–55 dB (nízká zátěž)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFFF66;border:1px solid #555\"></span>55–60 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFA500;border:1px solid #555\"></span>60–65 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FF3333;border:1px solid #555\"></span>65–70 dB (mezní hodnota)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#C71585;border:1px solid #555\"></span>70–75 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#4B0082;border:1px solid #555\"></span>&gt;75 dB (kritická zátěž)</div></div>",
+        "attributionLink": "https://geoportal.mzcr.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Letiste_Ldvn/ImageServer/WMSServer",
+        "name": "Aglomerace – letiště – Ldvn",
+        "description": "Strategická hluková mapa 2022 – letecká doprava v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
+        "minZoom": 2,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Ministerstvo zdravotnictví ČR",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px;line-height:1.6\"><strong>Legenda – Ldvn (den-večer-noc)</strong><div style=\"display:flex;align-items:center;gap:8px;margin-top:4px\"><span style=\"display:inline-block;width:22px;height:14px;background:#9FE9A1;border:1px solid #555\"></span>50–55 dB (nízká zátěž)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFFF66;border:1px solid #555\"></span>55–60 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FFA500;border:1px solid #555\"></span>60–65 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#FF3333;border:1px solid #555\"></span>65–70 dB (mezní hodnota)</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#C71585;border:1px solid #555\"></span>70–75 dB</div><div style=\"display:flex;align-items:center;gap:8px\"><span style=\"display:inline-block;width:22px;height:14px;background:#4B0082;border:1px solid #555\"></span>&gt;75 dB (kritická zátěž)</div></div>",
+        "attributionLink": "https://geoportal.mzcr.cz/"
+      }
+    ]
+  },
+  {
+    "name": "Ovzduší a stanice",
+    "layerTypes": "additional",
+    "defaultOpen": false,
+    "layers": [
+      {
+        "serverType": "wms",
+        "url": "https://gis.cenia.cz/geoserver/chmu_ovzdusi/wms",
+        "name": "Imisní stanice ČHMÚ",
+        "description": "Státní síť imisního monitoringu – stanice měřící kvalitu ovzduší",
+        "minZoom": 2,
+        "maxZoom": 13,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "statni_sit_imisniho_monitoringu"
+        ],
+        "attribution": "© Český hydrometeorologický ústav (ČHMÚ), CENIA",
+        "attributionLink": "https://www.chmi.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.cenia.cz/geoserver/chmu_meteo_stanice/wms",
+        "name": "Meteorologické stanice ČHMÚ",
+        "description": "Síť automatických meteorologických, klimatologických a srážkoměrných stanic ČHMÚ na území ČR a stanice v síti RBSN.",
+        "minZoom": 2,
+        "maxZoom": 13,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "merici_sit_automatickych_meteorologickych_klimatologickych_a_srazkomernych_stanic_chmu_2024"
+        ],
+        "attribution": "© Český hydrometeorologický ústav (ČHMÚ), CENIA",
+        "attributionLink": "https://www.chmi.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.cenia.cz/geoserver/chmu_voda/wms",
+        "name": "Hydrologické stanice ČHMÚ",
+        "description": "Síť stanic povrchových vod, pozorovací síť podzemních vod a síť pramenů.",
+        "minZoom": 2,
+        "maxZoom": 13,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "chmu_voda:sit_stanic_povrchovych_vod_prutoky"
+        ],
+        "attribution": "© Český hydrometeorologický ústav (ČHMÚ), CENIA",
+        "attributionLink": "https://www.chmi.cz"
+      }
+    ]
+  },
+  {
+    "name": "Geologie",
+    "layerTypes": "additional",
+    "defaultOpen": false,
+    "layers": [
+      {
+        "serverType": "wms",
+        "url": "https://mapy.geology.cz/arcgis/services/Geologie/geologicka_mapa50/MapServer/WMSServer",
+        "name": "Geologická mapa",
+        "description": "Bezešvá geologická mapa ČR (GEOCR50) – horniny, jejich hranice a tektonické linie.",
+        "minZoom": 1,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 0.7,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Česká geologická služba (ČGS)",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px\"><strong>Měřítko:</strong> 1:50 000</div>",
+        "attributionLink": "https://cgs.gov.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://mapy.geology.cz/arcgis/services/Geohazardy/radon50/MapServer/WMSServer",
+        "name": "Radonový index",
+        "description": "Mapa radonového indexu z geologického podloží – důležité pro stavebnictví.",
+        "minZoom": 1,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 0.7,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Česká geologická služba (ČGS)",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px\"><strong>Měřítko:</strong> 1:50 000</div>",
+        "attributionLink": "https://cgs.gov.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://mapy.geology.cz/arcgis/services/Pudy/pudni_typy50/MapServer/WMSServer",
+        "name": "Půdní typy",
+        "description": "Půdní mapa ČR podle Taxonomického klasifikačního systému půd ČR.",
+        "minZoom": 1,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 0.7,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Česká geologická služba (ČGS)",
+        "additionalInfo": "<div style=\"font-family:sans-serif;font-size:12px\"><strong>Měřítko:</strong> 1:50 000</div>",
+        "attributionLink": "https://cgs.gov.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://mapy.geology.cz/arcgis/services/Prozkoumanost/Vrtna_prozkoumanost/MapServer/WMSServer",
+        "name": "Vrtná prozkoumanost",
+        "description": "Databáze geologicky dokumentovaných objektů (vrtů) na území ČR.",
+        "minZoom": 4,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Česká geologická služba (ČGS)",
+        "attributionLink": "https://cgs.gov.cz/"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://mapy.geology.cz/arcgis/services/Geohazardy/svahove_deformace/MapServer/WMSServer",
+        "name": "Svahové deformace",
+        "description": "Registr svahových deformací ČGS – sesuvy a další gravitační procesy.",
+        "minZoom": 4,
+        "maxZoom": 12,
+        "active": false,
+        "opacity": 0.7,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Česká geologická služba (ČGS)",
+        "attributionLink": "https://cgs.gov.cz/"
+      }
+    ]
+  },
+  {
+    "name": "Životní prostředí",
+    "layerTypes": "additional",
+    "defaultOpen": false,
+    "layers": [
+      {
+        "serverType": "wms",
+        "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
+        "name": "Velkoplošná chráněná území",
+        "description": "Národní parky (NP) a chráněné krajinné oblasti (CHKO) včetně ochranných pásem.",
+        "minZoom": 4,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.6,
+        "wmsFormat": "image/png",
+        "layers": [
+          "0"
+        ],
+        "attribution": "© Agentura ochrany přírody a krajiny ČR (AOPK)",
+        "attributionLink": "https://www.ochranaprirody.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
+        "name": "Maloplošná chráněná území",
+        "description": "Národní přírodní rezervace (NPR), národní přírodní památky (NPP), přírodní rezervace (PR) a přírodní památky (PP).",
+        "minZoom": 5,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.6,
+        "wmsFormat": "image/png",
+        "layers": [
+          "4"
+        ],
+        "attribution": "© Agentura ochrany přírody a krajiny ČR (AOPK)",
+        "attributionLink": "https://www.ochranaprirody.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
+        "name": "Natura 2000 – evropsky významné lokality",
+        "description": "Evropsky významné lokality (EVL) soustavy Natura 2000.",
+        "minZoom": 5,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.5,
+        "wmsFormat": "image/png",
+        "layers": [
+          "11"
+        ],
+        "attribution": "© Agentura ochrany přírody a krajiny ČR (AOPK)",
+        "attributionLink": "https://www.ochranaprirody.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
+        "name": "Natura 2000 – ptačí oblasti",
+        "description": "Ptačí oblasti soustavy Natura 2000.",
+        "minZoom": 5,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.5,
+        "wmsFormat": "image/png",
+        "layers": [
+          "12"
+        ],
+        "attribution": "© Agentura ochrany přírody a krajiny ČR (AOPK)",
+        "attributionLink": "https://www.ochranaprirody.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
+        "name": "Geoparky",
+        "description": "Geoparky UNESCO a národní geoparky ČR.",
+        "minZoom": 4,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.5,
+        "wmsFormat": "image/png",
+        "layers": [
+          "10"
+        ],
+        "attribution": "© Agentura ochrany přírody a krajiny ČR (AOPK)",
+        "attributionLink": "https://www.ochranaprirody.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
+        "name": "Mokřady (Ramsar)",
+        "description": "Mezinárodně významné mokřady dle Ramsarské úmluvy a národně významné mokřady ČR.",
+        "minZoom": 5,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.6,
+        "wmsFormat": "image/png",
+        "layers": [
+          "15"
+        ],
+        "attribution": "© Agentura ochrany přírody a krajiny ČR (AOPK)",
+        "attributionLink": "https://www.ochranaprirody.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
+        "name": "Památné stromy",
+        "description": "Lokality vyhlášených památných stromů, stromořadí a skupin stromů.",
+        "minZoom": 4,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 1,
+        "wmsFormat": "image/png",
+        "layers": [
+          "8"
+        ],
+        "attribution": "© Agentura ochrany přírody a krajiny ČR (AOPK)",
+        "attributionLink": "https://www.ochranaprirody.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://heis.vuv.cz/data/webmap/wms.dll",
+        "name": "Záplavová území",
+        "description": "Záplavová území stoleté vody. 1% pravděbodobnost překročení za rok.",
+        "minZoom": 7,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.5,
+        "wmsFormat": "image/png",
+        "layers": [
+          "isvs_zapluz_100"
+        ],
+        "attribution": "© Výzkumný ústav vodohospodářský T. G. Masaryka (VÚV TGM)",
+        "attributionLink": "https://www.vuv.cz"
+      },
+      {
+        "serverType": "wms",
+        "url": "https://heis.vuv.cz/data/webmap/wms.dll",
+        "name": "Aktivní zóna záplavového území",
+        "description": "Aktivní zóna záplavového území pro Q100 – část provádějící rozhodující část povodňových průtoků.",
+        "minZoom": 7,
+        "maxZoom": 14,
+        "active": false,
+        "opacity": 0.6,
+        "wmsFormat": "image/png",
+        "layers": [
+          "isvs_zapluz_az"
+        ],
+        "attribution": "© Výzkumný ústav vodohospodářský T. G. Masaryka (VÚV TGM)",
+        "attributionLink": "https://www.vuv.cz"
       }
     ]
   }

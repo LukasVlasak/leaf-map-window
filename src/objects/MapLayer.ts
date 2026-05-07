@@ -16,8 +16,11 @@ export default class MapLayer {
     private _wmsFormat?: "image/png";
     private _layers?: string[];
     private _leafletLayer: LeafletLayer;
+    private _additionalInfo?: string;
+    private _attribution?: string;
+    private _attributionLink?: string;
 
-    constructor(serverType: "tile" | "wms" | "geojson", url: string, name: string, description: string, minZoom: number, maxZoom: number, active?: boolean, opacity?: number, wmsFormat?: "image/png", layers?: string[]) {
+    constructor(serverType: "tile" | "wms" | "geojson", url: string, name: string, description: string, minZoom: number, maxZoom: number, isBase: boolean, active?: boolean, opacity?: number, wmsFormat?: "image/png", layers?: string[], additionalInfo?: string, attribution?: string, attributionLink?: string) {
         this._ID = crypto.randomUUID();
         this._serverType = serverType;
         this._url = url;
@@ -37,26 +40,39 @@ export default class MapLayer {
         if (layers) {
             this._layers = layers;
         }
-        this._leafletLayer = this._bindLeafletLayer();
+        if (additionalInfo) {
+            this._additionalInfo = additionalInfo;
+        }
+        if (attribution) {
+            this._attribution = attribution;
+        }
+        if (attributionLink) {
+            this._attributionLink = attributionLink;
+        }
+        this._leafletLayer = this._bindLeafletLayer(isBase);
     }
 
-    private _bindLeafletLayer() {
+    private _bindLeafletLayer(isBase: boolean) {
         const options = { minZoom: this._minZoom, maxZoom: this._maxZoom, opacity: this._opacity };
 
         if (this._serverType === "wms") {
-            return L.tileLayer.wms(this._url, {
+            const layer = L.tileLayer.wms(this._url, {
                 ...options,
                 layers: this._layers?.join(",") ?? "",
                 format: this._wmsFormat ?? "image/png",
                 transparent: true,
             });
+            if (!isBase) layer.setZIndex(2);
+            return layer;
         }
 
         if (this._serverType === "geojson") {
             return L.geoJSON(undefined, options as GeoJSONOptions);
         }
 
-        return L.tileLayer(this._url, options);
+        const layer = L.tileLayer(this._url, options);
+        if (!isBase) layer.setZIndex(2);
+        return layer;
     }
 
     get ID(): string {
@@ -110,6 +126,22 @@ export default class MapLayer {
 
     get wmsFormat(): "image/png" | undefined {
         return this._wmsFormat;
+    }
+
+    get additionalInfo(): string | undefined {
+        return this._additionalInfo;
+    }
+
+    set additionalInfo(value: string) {
+        this._additionalInfo = value;
+    }
+
+    get attribution(): string | undefined {
+        return this._attribution;
+    }
+
+    get attributionLink(): string | undefined {
+        return this._attributionLink;
     }
 
     get leafletLayer(): LeafletLayer {

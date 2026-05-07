@@ -4,14 +4,12 @@ export default class MapLayerGroup {
     private _name: string;
     private _layerTypes: "base" | "additional";
     private _mapLayers: MapLayer[] = [];
-    private _defaultOpen: boolean = true;
+    private _defaultOpen: boolean;
 
-    constructor(name: string, layerTypes: "base" | "additional", defaultOpen?: boolean) {
+    constructor(name: string, layerTypes: "base" | "additional", defaultOpen: boolean) {
         this._name = name;
         this._layerTypes = layerTypes;
-        if (defaultOpen) {
-            this._defaultOpen = defaultOpen;
-        }
+        this._defaultOpen = defaultOpen;
     }
 
     addLayer(mapLayer: MapLayer) {

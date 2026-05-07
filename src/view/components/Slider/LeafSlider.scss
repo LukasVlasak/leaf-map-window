@@ -8,6 +8,7 @@ leaf-slider {
   .slider {
     appearance: none;
     flex: 1;
+    min-width: 0;
     height: 4px;
     background: black;
     border-radius: 4px;

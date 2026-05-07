@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import type MapLayer from "../../objects/MapLayer";
 import type MapLayerGroup from "../../objects/MapLayerGroup";
 import LeafSlider from "../components/Slider/LeafSlider";
@@ -32,9 +33,30 @@ export default class MapLayersView extends HTMLElement {
             const sectionTitle = document.createElement('div');
             sectionTitle.className = 'panel-section-title';
             sectionTitle.textContent = group.name;
+
+            const sectionToggle = document.createElement('div');
+            sectionToggle.className = 'panel-section-toggle';
+            const sectionToggleIcon = document.createElement('i');
+            sectionToggleIcon.className = 'fa fa-chevron-down';
+            sectionToggle.appendChild(sectionToggleIcon);
+
             sectionHead.appendChild(sectionTitle);
+            sectionHead.appendChild(sectionToggle);
+
+            const groupBody = document.createElement('div');
+            groupBody.className = 'panel-group-body';
+            if (!group.defaultOpen) {
+                sectionHead.classList.add('collapsed');
+                groupBody.classList.add('collapsed');
+            }
+
+            sectionHead.addEventListener('click', () => {
+                sectionHead.classList.toggle('collapsed');
+                groupBody.classList.toggle('collapsed');
+            });
 
             this._mapLayersViewDiv!.appendChild(sectionHead);
+            this._mapLayersViewDiv!.appendChild(groupBody);
 
             const isBase = group.layerTypes === 'base';
             const entries: LayerEntry[] = [];
@@ -81,6 +103,13 @@ export default class MapLayersView extends HTMLElement {
                     detail.appendChild(desc);
                 }
 
+                if (mapLayer.additionalInfo) {
+                    const info = document.createElement('div');
+                    info.className = 'layer-info';
+                    info.innerHTML = DOMPurify.sanitize(mapLayer.additionalInfo);
+                    detail.appendChild(info);
+                }
+
                 if (!isBase) {
                     const opacityRow = document.createElement('div');
                     opacityRow.className = 'layer-detail-row';
@@ -118,11 +147,27 @@ export default class MapLayersView extends HTMLElement {
                 maxZoomRow.appendChild(maxZoomVal);
                 detail.appendChild(maxZoomRow);
 
+                if (mapLayer.attribution) {
+                    const attr = document.createElement('p');
+                    attr.className = 'layer-attribution';
+                    if (mapLayer.attributionLink) {
+                        const a = document.createElement('a');
+                        a.href = mapLayer.attributionLink;
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        a.textContent = `Zdroj: ${mapLayer.attribution}`;
+                        attr.appendChild(a);
+                    } else {
+                        attr.textContent = `Zdroj: ${mapLayer.attribution}`;
+                    }
+                    detail.appendChild(attr);
+                }
+
                 layerDiv.appendChild(head);
                 layerDiv.appendChild(detail);
 
                 entries.push({ layer: mapLayer, layerDiv, checkEl: check });
-                this._mapLayersViewDiv!.appendChild(layerDiv);
+                groupBody.appendChild(layerDiv);
             }
 
             for (const entry of entries) {
