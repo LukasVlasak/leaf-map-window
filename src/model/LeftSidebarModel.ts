@@ -1,33 +1,36 @@
 import * as L from "leaflet";
 import "leaflet-draw";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
-import {type LatLng, type LeafletMouseEvent, polyline} from "leaflet";
+import {type LatLng, type LatLngBoundsExpression, type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
-import MapObject, {type LeafObjType} from "../objects/MapObject";
+import MapObject, {type LeafObjCoords, type LeafObjType} from "../objects/MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
 import type MapObjectsModel from "./MapObjectsModel";
 
-type geoJSONGemoetryType = "LineString" | "Polygon";
+type geoJSONGemoetryType = "LineString" | "Polygon" | "Point" | "MultiPoint" | "MultiLineString" | "MultiPolygon";
+
+interface GeoJSONExportProps {
+    type: LeafObjType;
+    id?: string;
+    name?: string;
+    description?: string;
+    color?: string;
+    strokeWidth?: number;
+    opacity?: number;
+    distance?: number;
+    area?: number;
+    circuit?: number;
+    popup?: string;
+    fabricCanvasData?: string;
+};
+
 export interface GeoJSONExportFeature {
     type: "Feature";
     geometry: {
         type: geoJSONGemoetryType;
-        coordinates: number[][] | number[][][];
+        coordinates: number[] | number[][] | number[][][];
     };
-    properties: {
-        id: string;
-        name: string;
-        type: LeafObjType;
-        description?: string;
-        color?: string;
-        strokeWidth?: number;
-        opacity: number;
-        distance?: number;
-        area?: number;
-        circuit?: number;
-        popup?: string;
-        fabricCanvasData?: string;
-    };
+    properties: GeoJSONExportProps;
 }
 
 interface GeoJSONExportObject {
@@ -143,45 +146,81 @@ export default class LeftSidebarModel {
 
     private _onImportClick(jsonString: string) {
         const json = JSON.parse(jsonString);
-        for (const feature of json.features) {
-            const geoJsonObjType: geoJSONGemoetryType = feature.geometry.type;
-            let leafObjType: LeafObjType;
-
-            if (geoJsonObjType === "Polygon" && feature.properties.fabricCanvasData) {
-                leafObjType = "canvas";
-            } else if (geoJsonObjType === "Polygon") {
-                leafObjType = "polygon";
-            } else if (geoJsonObjType === "LineString") {
-                leafObjType = "polyline";
+        if (json.type === "FeatureCollection") {
+            for (const feature of json.features) {
+                this._parseGeoJSONFeature(feature);
             }
-
-            let coordinates: L.LatLng[] | L.LatLng[][];
-            if (geoJsonObjType === "LineString") {
-                coordinates = (feature.geometry.coordinates as number[][]).map(([lng, lat]) => L.latLng(lat!, lng!));
+        } else if (json.type === "Feature") {
+            this._parseGeoJSONFeature(json);
+        } else {
+            // normal object
+            const coordinates = this._flipCoordinates(json.type, json.coordinates);
+            const propreties = { type: this._getLeafObjType(json.type) };
+            if (json.type.startsWith("Multi")) {
+                (coordinates as LatLng[] | LatLng[][] | LatLng[][][]).forEach(c => this._createMapObj(c, propreties));
             } else {
-                coordinates = (feature.geometry.coordinates as number[][][]).map(c =>
-                    c.map(([lng, lat]) => L.latLng(lat!, lng!))
-                );
-            }
-
-
-            // @ts-ignore
-            if (leafObjType === "canvas") {
-                // added to the mapObjectsModel within the method
-                this._canvasModel.loadCanvasContent(JSON.parse(feature.properties.fabricCanvasData), coordinates as LatLng[][]);
-            } else {
-                const newMapObject = new MapObject(coordinates, undefined, leafObjType!, feature.properties.opacity, feature.properties.name, feature.properties.description, feature.properties.color, feature.properties.strokeWidth, feature.properties.popup);
-                this._mapObjectsModel.addObject(newMapObject);
+                this._createMapObj(coordinates as LeafObjCoords, propreties);
             }
         }
+    }
+
+    private _parseGeoJSONFeature(feature: GeoJSONExportFeature) {
+        const coordinates = this._flipCoordinates(feature.geometry.type, feature.geometry.coordinates);
+        if (!feature.properties) {
+            // @ts-ignore
+            feature.properties = { type: "" };
+        }
+        feature.properties.type = this._getLeafObjType(feature.geometry.type, feature.properties.fabricCanvasData);
+
+        if (feature.geometry.type.startsWith("Multi")) {
+            (coordinates as LatLng[] | LatLng[][] | LatLng[][][]).forEach(c => this._createMapObj(c, feature.properties));
+        } else {
+            this._createMapObj(coordinates as LeafObjCoords, feature.properties);
+        }
+    }
+
+    private _createMapObj(coordinates: LeafObjCoords, props: GeoJSONExportProps) {
+        if (props.type === "canvas") {
+            // added to the mapObjectsModel within the method
+            this._canvasModel.loadCanvasContent(JSON.parse(props.fabricCanvasData!), coordinates as LatLng[][]);
+        } else {
+            const newMapObject = new MapObject(coordinates, undefined, props.type, props.opacity, props.name, props.description, props.color, props.strokeWidth, props.popup);
+            this._mapObjectsModel.addObject(newMapObject);
+        }
+    }
+
+    private _getLeafObjType(geoJsonObjType: geoJSONGemoetryType, fabricCanvasData?: string): LeafObjType {
+        if (geoJsonObjType === "Polygon" && fabricCanvasData) return "canvas";
+        if (geoJsonObjType === "Polygon" || geoJsonObjType === "MultiPolygon") return "polygon";
+        if (geoJsonObjType === "LineString" || geoJsonObjType === "MultiLineString") return "polyline";
+        return "point";
+    }
+
+    // coords => lng, lat -> lat, lng
+    private _flipCoordinates(geoJSONType: geoJSONGemoetryType, coords: number[] | number[][] | number[][][] | number[][][][]) {
+        if (geoJSONType === "Point") {
+            const coordinates = coords as number[];
+            return new L.LatLng(coordinates[1]!, coordinates[0]!);
+        }
+        if (geoJSONType === "LineString" || geoJSONType === "MultiPoint") {
+            return (coords as number[][]).map(([lng, lat]) => L.latLng(lat!, lng!));
+        }
+        if (geoJSONType === "Polygon" || geoJSONType === "MultiLineString") {
+            return (coords as number[][][]).map(c =>
+                c.map(([lng, lat]) => L.latLng(lat!, lng!))
+            );
+        }
+        return (coords as number[][][][]).map((c) => {
+            return c.map((cc) => {
+               return cc.map(([lng, lat]) => L.latLng(lat!, lng!));
+            });
+        });
     }
 
     private _onExportClick() {
         const geoJson: GeoJSONExportObject = {
             type: "FeatureCollection",
-            features: [
-
-            ]
+            features: []
         };
 
         for (const mapObject of this._mapObjectsModel.getMapObjects()) {

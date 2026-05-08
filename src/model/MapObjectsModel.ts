@@ -69,9 +69,14 @@ export default class MapObjectsModel {
         }
 
         this._selectedObject = object;
-        this._map.flyToBounds(object.layer.getBounds());
+        if (object.type === "point") {
+            this._map.flyTo((object.layer as L.CircleMarker).getLatLng());
+        } else {
+            this._map.flyToBounds((object.layer as L.Polyline | L.Polygon | L.ImageOverlay).getBounds());
+        }
 
         switch (object.type) {
+            case "point":
             case "polygon":
             case "polyline":
                 object.layer.setStyle({ color: SELECTED_OBJECT_COLOR, fillColor: SELECTED_OBJECT_COLOR });
@@ -107,6 +112,7 @@ export default class MapObjectsModel {
 
     private _resetObjectStyle(object: MapObject) {
         switch (object.type) {
+            case "point":
             case "polygon":
             case "polyline":
                 object.layer.setStyle({ color: object.color, fillColor: object.color });

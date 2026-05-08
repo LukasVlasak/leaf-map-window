@@ -1,18 +1,19 @@
 import L, {type LatLng, type LatLngBoundsExpression} from "leaflet";
 import Utils from "../utils/Utils";
 import {
-    type GeoJSONExportFeature,
+    type GeoJSONExportFeature, POLYGON_DRAW_OPTIONS,
     POLYLINE_DRAW_OPTIONS
 } from "../model/LeftSidebarModel";
 
-type LeafLayer = L.Polyline | L.Polygon | L.ImageOverlay;
-export type LeafObjType = "polygon" | "polyline" | "canvas";
+type LeafLayer = L.Polyline | L.Polygon | L.ImageOverlay | L.CircleMarker;
+export type LeafObjCoords = LatLngBoundsExpression | LatLng | LatLng[] | LatLng[][];
+export type LeafObjType = "polygon" | "polyline" | "canvas" | "point";
 
 export default class MapObject {
     private _ID: string;
     // @ts-ignore
     private _name: string;
-    private _coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][];
+    private _coordinates: LeafObjCoords;
     // @ts-ignore
     private _layer: LeafLayer;
     private _type: LeafObjType;
@@ -27,7 +28,7 @@ export default class MapObject {
     private _opacity: number = 1;
     private _fabricCanvasContent?: string = undefined; // for export
 
-    constructor(coordinates: LatLngBoundsExpression | LatLng[] | LatLng[][], layer: LeafLayer | undefined, type: LeafObjType, opacity?: number, name?: string, description?: string, color?: string, strokeWidth?: number, popup?: string) {
+    constructor(coordinates: LeafObjCoords, layer: LeafLayer | undefined, type: LeafObjType, opacity?: number, name?: string, description?: string, color?: string, strokeWidth?: number, popup?: string) {
         this._ID = crypto.randomUUID();
         this._coordinates = coordinates;
         this._type = type;
@@ -52,24 +53,61 @@ export default class MapObject {
 
     private _bindLeafletLayer() {
         if (this.type === "polyline") {
+            if (!this.color) {
+                this._color = POLYLINE_DRAW_OPTIONS.shapeOptions.color;
+            }
+            if (!this.strokeWidth) {
+                this._strokeWidth = POLYLINE_DRAW_OPTIONS.shapeOptions.weight;
+            }
+            if (!this.opacity) {
+                this._opacity = POLYLINE_DRAW_OPTIONS.shapeOptions.opacity;
+            }
             // @ts-ignore
             this.layer = L.polyline(this.coordinates as LatLng[], {
-                color: this.color ?? POLYLINE_DRAW_OPTIONS.shapeOptions.color,
-                weight: this.strokeWidth ?? POLYLINE_DRAW_OPTIONS.shapeOptions.weight,
-                opacity: this.opacity ?? POLYLINE_DRAW_OPTIONS.shapeOptions.opacity,
+                color: this.color,
+                weight: this.strokeWidth,
+                opacity: this.opacity,
             });
         }
 
         if (this.type === "polygon") {
+            if (!this.color) {
+                this._color = POLYGON_DRAW_OPTIONS.shapeOptions.color;
+            }
+            if (!this.strokeWidth) {
+                this._strokeWidth = POLYGON_DRAW_OPTIONS.shapeOptions.weight;
+            }
+            if (!this.opacity) {
+                this._opacity = POLYGON_DRAW_OPTIONS.shapeOptions.opacity;
+            }
             this.layer = L.polygon(this.coordinates as LatLng[][], {
-                color: this.color ?? POLYLINE_DRAW_OPTIONS.shapeOptions.color,
-                fillColor: this.color ?? POLYLINE_DRAW_OPTIONS.shapeOptions.color,
-                weight: this.strokeWidth ?? POLYLINE_DRAW_OPTIONS.shapeOptions.weight,
-                opacity: this.opacity ?? POLYLINE_DRAW_OPTIONS.shapeOptions.opacity,
-                fillOpacity: this.opacity ?? POLYLINE_DRAW_OPTIONS.shapeOptions.opacity,
+                color: this.color,
+                fillColor: this.color,
+                weight: this.strokeWidth,
+                opacity: this.opacity,
+                fillOpacity: this.opacity,
             });
         }
 
+        if (this.type === "point") {
+            if (!this.color) {
+                this._color = POLYLINE_DRAW_OPTIONS.shapeOptions.color;
+            }
+            if (!this.strokeWidth) {
+                this._strokeWidth = POLYLINE_DRAW_OPTIONS.shapeOptions.weight;
+            }
+            if (!this.opacity) {
+                this._opacity = POLYLINE_DRAW_OPTIONS.shapeOptions.opacity;
+            }
+            this.layer = L.circleMarker(this.coordinates as LatLng, {
+                color: this.color,
+                fillColor: this.color,
+                weight: this.strokeWidth,
+                opacity: this.opacity,
+                fillOpacity: this.opacity,
+                radius: 6,
+            });
+        }
         // canvas layer is created by CanvasModel.loadCanvasContent
     }
 
@@ -101,8 +139,8 @@ export default class MapObject {
         } else if (this.type === "polyline") {
             const latlngs = (this.layer as L.Polyline).getLatLngs() as L.LatLng[];
             this.distance = this._calcPolylineDistance(latlngs);
-        } else {
-            const bounds = this.layer.getBounds();
+        } else if (this.type === "canvas") {
+            const bounds = (this.layer as L.ImageOverlay).getBounds();
             const outerRing = [bounds.getNorthWest(), bounds.getNorthEast(), bounds.getSouthEast(), bounds.getSouthWest()];
             this.circuit = this._calcPolylineDistance([...outerRing, outerRing[0]!]);
         }
@@ -117,7 +155,7 @@ export default class MapObject {
         return this._name;
     }
 
-    get coordinates(): LatLngBoundsExpression | LatLng[] | LatLng[][] {
+    get coordinates(): LeafObjCoords {
         return this._coordinates;
     }
 
@@ -215,7 +253,7 @@ export default class MapObject {
     }
 
     set opacity(value: number) {
-        this._opacity = value / 100;
+        this._opacity = Math.round(value) / 100;
         this.layer.setStyle({opacity: this.opacity, fillOpacity: this.opacity});
     }
 
@@ -268,6 +306,17 @@ export default class MapObject {
                 geometry: {
                     type: "Polygon",
                     coordinates: coordinates
+                },
+                properties,
+            };
+        } else if (this.type === "point") {
+            const latlng = (this.layer as L.CircleMarker).getLatLng();
+
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "Point",
+                    coordinates: [latlng.lng, latlng.lat]
                 },
                 properties,
             };

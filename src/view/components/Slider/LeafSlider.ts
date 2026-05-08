@@ -21,13 +21,13 @@ export default class LeafSlider extends HTMLElement {
         this._input = document.createElement('input');
         this._input.type = 'range';
         this._input.className = 'slider';
-        this._input.min = String(this._min);
-        this._input.max = String(this._max);
-        this._input.value = String(this._value);
+        this._input.min = this._min.toString();
+        this._input.max = this._max.toString();
+        this._input.value = this._value.toString();
 
         this._valSpan = document.createElement('span');
         this._valSpan.className = 'slider-val';
-        this._valSpan.textContent = this._value + this._unit;
+        this._valSpan.textContent = Math.round(this._value) + this._unit;
 
         this._input.addEventListener('input', () => {
             this._valSpan.textContent = this._input.value + this._unit;

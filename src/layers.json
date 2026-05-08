@@ -71,7 +71,7 @@
       {
         "serverType": "wms",
         "url": "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
-        "name": "Výškový stínovaný reliéf)",
+        "name": "Výškový stínovaný reliéf",
         "description": "Digitální model reliéfu terénu ČR 5. generace – šedý stínovaný reliéf s 10násobným zdůrazněním výšek.",
         "minZoom": 0,
         "maxZoom": 14,
