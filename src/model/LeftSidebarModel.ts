@@ -1,7 +1,7 @@
 import * as L from "leaflet";
 import "leaflet-draw";
 import type LeftSidebarView from "../view/LeftSidebar/LeftSidebarView";
-import {type LatLng, type LatLngBoundsExpression, type LeafletMouseEvent, polyline} from "leaflet";
+import {type LatLng, type LeafletMouseEvent, polyline} from "leaflet";
 import type CanvasModel from "./CanvasModel";
 import MapObject, {type LeafObjCoords, type LeafObjType} from "../objects/MapObject";
 import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
