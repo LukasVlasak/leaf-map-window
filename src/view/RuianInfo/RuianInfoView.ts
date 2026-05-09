@@ -29,7 +29,13 @@ export default class RuianInfoView {
 
         const header = document.createElement('div');
         header.className = 'ruian-header';
-        header.textContent = (municipality?.nazev ?? '-') + ' > ' + (district?.nazev ?? '-') + ' > ' + (region?.nazev ?? '-');
+        header.innerHTML = (municipality ?
+            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/obce/${municipality.kod}">${municipality.nazev}</a>`
+            : '-') + ' > ' + (district?.nazev ?
+            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/okresy/${district.kod}">${district.nazev}</a>` :
+            '-') + ' > ' + (region?.nazev ?
+            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/vusc/${region.kod}">${region.nazev}</a>`
+            : '-');
         container.appendChild(header);
 
         if (land) {
@@ -46,7 +52,7 @@ export default class RuianInfoView {
                 : land.kmenovecislo != null ? String(land.kmenovecislo) : null;
 
             if (parcelNum) {
-                section.appendChild(RuianInfoView._row('Číslo', parcelNum));
+                section.appendChild(RuianInfoView._row('Číslo', parcelNum, land.id ? `https://vdp.cuzk.gov.cz/vdp/ruian/parcely/${land.id}` : undefined));
             }
 
             const druhNazev = DRUH_POZEMKU[land.druhpozemkukod];
@@ -73,14 +79,14 @@ export default class RuianInfoView {
         return container;
     }
 
-    static renderLoading(): HTMLElement {
+    static renderLoading() {
         const container = document.createElement('div');
         container.className = 'ruian-popup loading';
         container.textContent = 'Načítání…';
         return container;
     }
 
-    private static _row(label: string, value: string): HTMLElement {
+    private static _row(label: string, value: string, href?: string) {
         const row = document.createElement('div');
         row.className = 'ruian-row';
 
@@ -90,7 +96,17 @@ export default class RuianInfoView {
 
         const v = document.createElement('span');
         v.className = 'ruian-value';
-        v.textContent = value;
+
+        if (href) {
+            const a = document.createElement('a');
+            a.className = 'ruian-link';
+            a.href = href;
+            a.target = '_blank';
+            a.textContent = value;
+            v.appendChild(a);
+        } else {
+            v.textContent = value;
+        }
 
         row.appendChild(l);
         row.appendChild(v);

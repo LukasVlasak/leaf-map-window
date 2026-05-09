@@ -37,12 +37,13 @@
   }
 
   .ruian-header {
-    padding: 9px 22px;
+    padding: 9px 14px;
     background: vars.$bgSurfaceMuted;
     font-size: 11px;
     color: vars.$secondaryTextColor;
     border-bottom: 1px solid vars.$borderLight;
     line-height: 1.4;
+    max-width: 80%;
   }
 
   .ruian-section {
@@ -83,5 +84,14 @@
     padding: 14px 16px;
     color: vars.$mutedTextColor;
     font-size: 12px;
+  }
+
+  .ruian-link {
+    color: vars.$primaryColor;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
