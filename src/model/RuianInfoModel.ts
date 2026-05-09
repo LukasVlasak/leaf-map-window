@@ -1,5 +1,5 @@
 import * as L from "leaflet";
-import type { LeafletMouseEvent } from "leaflet";
+import {GeoJSON, type LeafletMouseEvent} from "leaflet";
 import RuianConnector from "../ruian/RuianConnector";
 import RuianInfoView, { type RuianData } from "../view/RuianInfo/RuianInfoView";
 
@@ -8,6 +8,8 @@ export default class RuianInfoModel {
     private _epsg5514: L.Proj.CRS;
     private _ruianConnector: RuianConnector;
     private _currentPopup: L.Popup | null = null;
+
+    private _geoJSONLands: GeoJSON[] = [];
 
     constructor(map: L.Map, epsg5514: L.Proj.CRS, ruianConnector: RuianConnector) {
         this._map = map;
@@ -29,6 +31,29 @@ export default class RuianInfoModel {
 
         if (this._currentPopup === popup && popup.isOpen()) {
             popup.setContent(RuianInfoView.render(data));
+            popup.on('remove', () => {
+                this._removeGeoJSONLands();
+            });
+            if (data.land) {
+                this._removeGeoJSONLands();
+                const geoJsonLand = L.geoJson(data.land as any);
+                this._geoJSONLands.push(geoJsonLand);
+            }
+        }
+
+        this._renderGeoJSONLands();
+    }
+
+    private _removeGeoJSONLands() {
+        for (const geoJSON of this._geoJSONLands) {
+            geoJSON.removeFrom(this._map);
+        }
+        this._geoJSONLands = [];
+    }
+
+    private _renderGeoJSONLands() {
+        for (const geoJSON of this._geoJSONLands) {
+            geoJSON.addTo(this._map);
         }
     }
 
@@ -74,10 +99,10 @@ export default class RuianInfoModel {
         }
 
         return {
-            land: land?.properties ?? null,
+            land: land ?? null,
             municipality: municipality?.properties ?? null,
             district: district?.properties ?? null,
-            region: region?.properties ?? null,
+            region: region?.properties ?? null
         };
     }
 }

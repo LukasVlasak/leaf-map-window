@@ -25,7 +25,8 @@ export default class RuianInfoView {
         const container = document.createElement('div');
         container.className = 'ruian-popup';
 
-        const { land, municipality, district, region } = data;
+        const { land: landRes, municipality, district, region } = data;
+        const land = landRes?.properties;
 
         const header = document.createElement('div');
         header.className = 'ruian-header';
