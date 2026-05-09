@@ -15,8 +15,8 @@ import CanvasModel from "./model/CanvasModel";
 import MapLayersModel from "./model/MapLayersModel";
 import MapObjectsModel from "./model/MapObjectsModel";
 import LayerStore from "./store/LayerStore";
-import type {LeafletMouseEvent} from "leaflet";
 import RuianConnector from "./ruian/RuianConnector";
+import RuianInfoModel from "./model/RuianInfoModel";
 
 const EPSG5514 = new L.Proj.CRS(
     'EPSG:5514',
@@ -30,18 +30,15 @@ const EPSG5514 = new L.Proj.CRS(
 export default class MapWindow {
     map: L.Map;
     element: string;
-    private _ruianConnector: RuianConnector;
 
     constructor(element: string = 'map', view: L.LatLngExpression = [50.08, 14.44], zoom: number = 7) {
         this.element = element;
         this.map = L.map(element, { attributionControl: false, crs: EPSG5514, maxZoom: 14 }).setView(view, zoom);
         this.map.zoomControl.setPosition('bottomright');
-        this._ruianConnector = new RuianConnector();
     }
 
     init(): void {
         this.initView();
-        this.map.on('click', this._onMapClick.bind(this));
     }
 
     private initView(): void {
@@ -75,47 +72,7 @@ export default class MapWindow {
         new MapStatusBarModel(mapStatusBarView, this.map);
 
         container.appendChild(new AttributionControlView());
-    }
 
-    private async _onMapClick(e: LeafletMouseEvent) {
-        const epsg5514 = EPSG5514.project(e.latlng);
-
-        let land, municipality, district, region;
-        let districtRes, regionRes;
-        const [landRes, municipalityRes] = await Promise.all([
-            this._ruianConnector.getLandByPoint(epsg5514.x, epsg5514.y),
-            this._ruianConnector.getMunicipalityByPoint(epsg5514.x, epsg5514.y)
-        ]);
-        if (landRes) {
-            land = landRes.features?.[0];
-        }
-        if (municipalityRes) {
-            municipality = municipalityRes.features?.[0];
-        }
-
-        if (municipality) {
-            const districtCode = municipality.properties.okres;
-            if (districtCode) {
-                districtRes = await this._ruianConnector.getDistrictByCode(districtCode);
-            }
-        } else {
-            districtRes = await this._ruianConnector.getDistrictByPoint(epsg5514.x, epsg5514.y);
-        }
-
-        if (districtRes) {
-            district = districtRes.features?.[0];
-        }
-        if (district) {
-            const regionCode = district.properties.vusc;
-            if (regionCode) {
-                regionRes = await this._ruianConnector.getRegionByCode(regionCode);
-            }
-        } else {
-            regionRes = await this._ruianConnector.getRegionByPoint(epsg5514.x, epsg5514.y);
-        }
-
-        if (regionRes) {
-            region = regionRes.features?.[0];
-        }
+        new RuianInfoModel(this.map, EPSG5514, new RuianConnector());
     }
 }

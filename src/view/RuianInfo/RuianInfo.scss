@@ -1,0 +1,87 @@
+@use "../../styles/variables" as vars;
+
+.leaflet-popup.ruian-popup-wrapper {
+  .leaflet-popup-content-wrapper {
+    border-radius: vars.$panelBorderRadius;
+    box-shadow: vars.$primaryPanelBoxShadow;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid vars.$borderLight;
+  }
+
+  .leaflet-popup-content {
+    margin: 0;
+    min-width: 200px;
+    max-width: 280px;
+  }
+
+  .leaflet-popup-close-button {
+    top: 8px;
+    right: 10px;
+    color: vars.$mutedTextColor;
+
+    &:hover {
+      color: vars.$textColor;
+    }
+  }
+}
+
+.ruian-popup {
+  font-size: 12px;
+  color: vars.$textColor;
+  font-family: inherit;
+
+  &.loading {
+    padding: 14px 16px;
+    color: vars.$mutedTextColor;
+  }
+
+  .ruian-header {
+    padding: 9px 22px;
+    background: vars.$bgSurfaceMuted;
+    font-size: 11px;
+    color: vars.$secondaryTextColor;
+    border-bottom: 1px solid vars.$borderLight;
+    line-height: 1.4;
+  }
+
+  .ruian-section {
+    padding: 10px 14px 12px;
+
+    .ruian-section-title {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: vars.$mutedTextColor;
+      margin-bottom: 7px;
+    }
+  }
+
+  .ruian-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 2px 0;
+
+    .ruian-label {
+      color: vars.$secondaryTextColor;
+      font-size: 11.5px;
+      flex-shrink: 0;
+    }
+
+    .ruian-value {
+      color: vars.$textColor;
+      font-weight: 500;
+      font-size: 12px;
+      text-align: right;
+    }
+  }
+
+  .ruian-empty {
+    padding: 14px 16px;
+    color: vars.$mutedTextColor;
+    font-size: 12px;
+  }
+}
