@@ -1,8 +1,11 @@
+import DOMPurify from "dompurify";
+
 export default class RuianConnector {
 
     private _baseURL = "https://ags.cuzk.gov.cz/arcgis/rest/services/RUIAN/Prohlizeci_sluzba_nad_daty_RUIAN/MapServer";
 
     private _landLayer = 5; // parcela
+    private _cadastralAreaLayer = 7; // katastralni uzemi
     private _municipalityLayer = 12; // obec
     private _districtLayer = 15; // okres
     private _regionLayer = 17; // kraj
@@ -10,7 +13,7 @@ export default class RuianConnector {
     constructor() {
     }
 
-    private async _getLayerByPoint(layerId: number, returnGeometry: boolean, outFields: "*" | string[], x?: number, y?: number, where = "1=1") {
+    private async _getLayerByPoint(layerId: number, returnGeometry: boolean, outFields: "*" | string[], x?: number, y?: number, where = "1=1", resultRecordCount?: string) {
         const params = new URLSearchParams({
             outSR: "4326",
             returnGeometry: returnGeometry,
@@ -24,18 +27,51 @@ export default class RuianConnector {
             params.set("spatialRel", "esriSpatialRelIntersects");
             params.set("geometry", `${x},${y}`);
         }
-
-        const url = this._baseURL + "/" + layerId + "/query?" + params.toString();
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`RUIAN request failed: ${response.status}`);
+        if (resultRecordCount) {
+            params.set("resultRecordCount", resultRecordCount);
         }
 
-        return response.json();
+        const url = this._baseURL + "/" + layerId + "/query?" + params.toString();
+
+        const controller = new AbortController();
+
+        const timeout = setTimeout(() => {
+            controller.abort("timeout");
+        }, 3000);
+
+        try {
+            const response = await fetch(url, {
+                signal: controller.signal
+            });
+
+            if (!response.ok) {
+                throw new Error(`RUIAN request failed: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (err) {
+            if (controller.signal.aborted) {
+                return {
+                    type: "FeatureCollection",
+                    features: []
+                };
+            }
+            throw new Error(`RUIAN request failed: ${err}`);
+        } finally {
+            clearTimeout(timeout);
+        }
     }
+
     async getLandByPoint(x: number, y: number) {
         return this._getLayerByPoint(this._landLayer, true, "*", x, y);
+    }
+
+    async searchLandByLandNumber(landNumber: string) {
+        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, "cisloparcely LIKE '%" + DOMPurify.sanitize(landNumber) + "%'", "5");
+    }
+
+    async getCadastralAreaByCode(code: string) {
+        return this._getLayerByPoint(this._cadastralAreaLayer, false, ["nazev"], undefined, undefined, "kod="+code);
     }
 
     async getMunicipalityByPoint(x: number, y: number) {

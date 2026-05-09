@@ -41,6 +41,8 @@ export default class LeftSidebarView extends HTMLElement {
         secondGroup.appendChild(this._importBtn);
         secondGroup.appendChild(this._exportBtn);
         this.appendChild(secondGroup);
+
+        this.addEventListener('click', (e) => e.stopPropagation());
     }
 
     onPolygonClick(handler: () => void) {

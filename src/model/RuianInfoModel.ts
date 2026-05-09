@@ -2,23 +2,30 @@ import * as L from "leaflet";
 import {GeoJSON, type LeafletMouseEvent} from "leaflet";
 import RuianConnector from "../ruian/RuianConnector";
 import RuianInfoView, { type RuianData } from "../view/RuianInfo/RuianInfoView";
+import type SearchBarView from "../view/SearchBar/SearchBarView";
 
 export default class RuianInfoModel {
     private _map: L.Map;
     private _epsg5514: L.Proj.CRS;
     private _ruianConnector: RuianConnector;
     private _currentPopup: L.Popup | null = null;
+    private _searchBarView: SearchBarView;
 
     private _geoJSONLands: GeoJSON[] = [];
 
-    constructor(map: L.Map, epsg5514: L.Proj.CRS, ruianConnector: RuianConnector) {
+    constructor(map: L.Map, epsg5514: L.Proj.CRS, ruianConnector: RuianConnector, searchBarView: SearchBarView) {
         this._map = map;
         this._epsg5514 = epsg5514;
         this._ruianConnector = ruianConnector;
         this._map.on('click', this._onMapClick.bind(this));
+        this._searchBarView = searchBarView;
+
+        this._searchBarView.onSearchClickHandler(this._onRUIANSearch.bind(this));
+        this._searchBarView.onResultClickHandler(this._onLandResultClick.bind(this));
     }
 
     private async _onMapClick(e: LeafletMouseEvent) {
+        this._searchBarView.clearResults();
         const latlng = this._epsg5514.project(e.latlng);
 
         const popup = L.popup({ className: 'ruian-popup-wrapper', maxWidth: 300 })
@@ -36,12 +43,32 @@ export default class RuianInfoModel {
             });
             if (data.land) {
                 this._removeGeoJSONLands();
-                const geoJsonLand = L.geoJson(data.land as any);
-                this._geoJSONLands.push(geoJsonLand);
+                if (this._map.getZoom() >= 9) {
+                    const geoJsonLand = L.geoJson(data.land as any);
+                    this._geoJSONLands.push(geoJsonLand);
+                }
             }
         }
 
         this._renderGeoJSONLands();
+    }
+
+    private async _onRUIANSearch(value: string) {
+        this._searchBarView.showResultLoader();
+        const results = await this._ruianConnector.searchLandByLandNumber(value);
+        if (results && results.features.length > 0) {
+            for (const feature of results.features) {
+                const cadastralAreaRes = await this._ruianConnector.getCadastralAreaByCode(feature.properties.katastralniuzemi);
+                const cadastralArea = cadastralAreaRes.features?.[0]?.properties ?? null;
+
+                feature.properties.katastralniuzemiNazev = cadastralArea?.nazev ?? null;
+            }
+        }
+        this._searchBarView.renderResults(results?.features ?? []);
+    }
+
+    private _onLandResultClick(id: number) {
+        console.log(id);
     }
 
     private _removeGeoJSONLands() {

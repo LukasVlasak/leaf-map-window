@@ -1,3 +1,5 @@
+import Utils from "../../utils/Utils";
+
 export interface RuianData {
     land: Record<string, any> | null;
     municipality: Record<string, any> | null;
@@ -48,9 +50,7 @@ export default class RuianInfoView {
             heading.textContent = 'Parcela';
             section.appendChild(heading);
 
-            const parcelNum = land.poddelenicisla
-                ? `${land.kmenovecislo}/${land.poddelenicisla}`
-                : land.kmenovecislo != null ? String(land.kmenovecislo) : null;
+            const parcelNum = Utils.getLandNumber(land);
 
             if (parcelNum) {
                 section.appendChild(RuianInfoView._row('Číslo', parcelNum, land.id ? `https://vdp.cuzk.gov.cz/vdp/ruian/parcely/${land.id}` : undefined));

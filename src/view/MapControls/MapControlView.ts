@@ -18,6 +18,8 @@ export default class MapControlView extends HTMLElement {
 
         locateStack.appendChild(this._locateBtn);
         this.appendChild(locateStack);
+
+        this.addEventListener('click', (e) => e.stopPropagation());
     }
 
     onLocateBtnClick(handler: () => void): void {

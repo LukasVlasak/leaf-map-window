@@ -36,4 +36,16 @@ export default class Utils {
         }
         return Math.round(area).toLocaleString('cs-CZ') + ' m²';
     }
+
+    static getLandNumber(land: any) {
+        if (land) {
+            if (land.poddelenicisla) {
+                return land.kmenovecislo + "/" + land.poddelenicisla;
+            } else {
+                return land.kmenovecislo.toString();
+            }
+        } else {
+            return '';
+        }
+    }
 }

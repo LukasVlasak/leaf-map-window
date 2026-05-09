@@ -71,8 +71,10 @@ export default class MapWindow {
         container.appendChild(mapStatusBarView);
         new MapStatusBarModel(mapStatusBarView, this.map);
 
+        const searchBar = new SearchBarView();
+        container.appendChild(searchBar);
         container.appendChild(new AttributionControlView());
 
-        new RuianInfoModel(this.map, EPSG5514, new RuianConnector());
+        new RuianInfoModel(this.map, EPSG5514, new RuianConnector(), searchBar);
     }
 }
