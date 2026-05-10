@@ -55,8 +55,20 @@ export default class RuianInfoModel {
 
     private async _onRUIANSearch(value: string) {
         this._searchBarView.showResultLoader();
-        const results = await this._ruianConnector.searchLandByLandNumber(value);
-        if (results && results.features.length > 0) {
+
+        const match = value.match(/^(\d+)\/(\d+)$/);
+        let results;
+        if (match) {
+            const kmenovecislo = match[1];
+            const poddelenicisla = match[2];
+
+            if (kmenovecislo && poddelenicisla) {
+                results = await this._ruianConnector.searchLandByKmenoveCisloAndPoddelniCisla(kmenovecislo, poddelenicisla);
+            }
+        } else {
+            results = await this._ruianConnector.searchLandByLandNumber(value);
+        }
+        if (results && results.features && results.features.length > 0) {
             for (const feature of results.features) {
                 const cadastralAreaRes = await this._ruianConnector.getCadastralAreaByCode(feature.properties.katastralniuzemi);
                 const cadastralArea = cadastralAreaRes.features?.[0]?.properties ?? null;

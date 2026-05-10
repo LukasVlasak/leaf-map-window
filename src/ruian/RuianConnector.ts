@@ -67,7 +67,11 @@ export default class RuianConnector {
     }
 
     async searchLandByLandNumber(landNumber: string) {
-        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, "cisloparcely LIKE '%" + DOMPurify.sanitize(landNumber) + "%'", "5");
+        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, "cisloparcely LIKE '%" + landNumber + "%'", "5");
+    }
+
+    async searchLandByKmenoveCisloAndPoddelniCisla(kmenovecislo: string, poddelenicisla: string) {
+        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, "kmenovecislo = " + kmenovecislo + " and poddelenicisla = " + poddelenicisla, "5");
     }
 
     async getCadastralAreaByCode(code: string) {

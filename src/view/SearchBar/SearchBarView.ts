@@ -28,7 +28,7 @@ export default class SearchBarView extends HTMLElement {
 
         this._inputEl = document.createElement('input');
         this._inputEl.type = 'text';
-        this._inputEl.placeholder = 'Hledat místo…';
+        this._inputEl.placeholder = 'Hledat parcelu podle čísla';
 
         this._searchBtnEl = document.createElement('button');
         this._searchBtnEl.className = 'search-search-btn';
@@ -51,6 +51,7 @@ export default class SearchBarView extends HTMLElement {
         });
 
         this.addEventListener('click', (e) => e.stopPropagation());
+        this.addEventListener('mousedown', (e) => e.stopPropagation());
     }
 
     onSearchClickHandler(handler: (value: string) => void) {
