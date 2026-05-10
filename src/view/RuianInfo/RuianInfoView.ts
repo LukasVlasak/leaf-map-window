@@ -1,4 +1,5 @@
 import Utils from "../../utils/Utils";
+import DOMPurify from "dompurify";
 
 export interface RuianData {
     land: Record<string, any> | null;
@@ -33,11 +34,11 @@ export default class RuianInfoView {
         const header = document.createElement('div');
         header.className = 'ruian-header';
         header.innerHTML = (municipality ?
-            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/obce/${municipality.kod}">${municipality.nazev}</a>`
+            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/obce/${DOMPurify.sanitize(municipality.kod)}">${DOMPurify.sanitize(municipality.nazev)}</a>`
             : '-') + ' > ' + (district?.nazev ?
-            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/okresy/${district.kod}">${district.nazev}</a>` :
+            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/okresy/${DOMPurify.sanitize(district.kod)}">${DOMPurify.sanitize(district.nazev)}</a>` :
             '-') + ' > ' + (region?.nazev ?
-            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/vusc/${region.kod}">${region.nazev}</a>`
+            `<a class="ruian-link" target="_blank" href="https://vdp.cuzk.gov.cz/vdp/ruian/vusc/${DOMPurify.sanitize(region.kod)}">${DOMPurify.sanitize(region.nazev)}</a>`
             : '-');
         container.appendChild(header);
 
@@ -62,7 +63,7 @@ export default class RuianInfoView {
             }
 
             if (land.zpusobyvyuzitipozemku != null) {
-                section.appendChild(RuianInfoView._row('Využití', String(land.zpusobyvyuzitipozemku)));
+                section.appendChild(RuianInfoView._row('Využití', land.zpusobyvyuzitipozemku.toString()));
             }
 
             if (land.vymeraparcely != null) {
@@ -85,6 +86,19 @@ export default class RuianInfoView {
         container.className = 'ruian-popup loading';
         container.textContent = 'Načítání…';
         return container;
+    }
+
+    private static _appendHeaderPart(container: HTMLElement, text: string | undefined, href: string | undefined) {
+        if (text && href) {
+            const a = document.createElement('a');
+            a.className = 'ruian-link';
+            a.target = '_blank';
+            a.href = href;
+            a.textContent = text;
+            container.appendChild(a);
+        } else {
+            container.appendChild(document.createTextNode('-'));
+        }
     }
 
     private static _row(label: string, value: string, href?: string) {

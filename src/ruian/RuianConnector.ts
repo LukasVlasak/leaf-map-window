@@ -1,5 +1,3 @@
-import DOMPurify from "dompurify";
-
 export default class RuianConnector {
 
     private _baseURL = "https://ags.cuzk.gov.cz/arcgis/rest/services/RUIAN/Prohlizeci_sluzba_nad_daty_RUIAN/MapServer";
@@ -67,11 +65,19 @@ export default class RuianConnector {
     }
 
     async searchLandByLandNumber(landNumber: string) {
-        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, "cisloparcely LIKE '%" + landNumber + "%'", "5");
+        if (!/^\d[\d/]*$/.test(landNumber)) {
+            alert("Invalid land number");
+            return;
+        }
+        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, `cisloparcely LIKE '%${landNumber}%'`, "5");
     }
 
     async searchLandByKmenoveCisloAndPoddelniCisla(kmenovecislo: string, poddelenicisla: string) {
-        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, "kmenovecislo = " + kmenovecislo + " and poddelenicisla = " + poddelenicisla, "5");
+        if (!/^\d+$/.test(kmenovecislo) || !/^\d+$/.test(poddelenicisla)) {
+            alert("Invalid land number");
+            return;
+        }
+        return this._getLayerByPoint(this._landLayer, true, "*", undefined, undefined, `kmenovecislo = ${kmenovecislo} and poddelenicisla = ${poddelenicisla}`, "5");
     }
 
     async getCadastralAreaByCode(code: string) {
