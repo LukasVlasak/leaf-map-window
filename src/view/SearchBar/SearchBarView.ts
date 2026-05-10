@@ -5,7 +5,7 @@ export default class SearchBarView extends HTMLElement {
     private _inputEl: HTMLInputElement | null = null;
     private _searchBtnEl: HTMLButtonElement | null = null;
     private _resultsEl: HTMLDivElement | null = null;
-    private _onResultClick: ((id: number) => void) | null = null;
+    private _onResultClick: ((landGeom: any) => void) | null = null;
 
     constructor() {
         super();
@@ -60,7 +60,7 @@ export default class SearchBarView extends HTMLElement {
         });
     }
 
-    onResultClickHandler(handler: (id: number) => void) {
+    onResultClickHandler(handler: (landGeom: any) => void) {
         this._onResultClick = handler;
     }
 
@@ -87,6 +87,7 @@ export default class SearchBarView extends HTMLElement {
 
         for (const feature of features) {
             const land = feature.properties;
+            const landGeom = feature.geometry;
             const landNumber = Utils.getLandNumber(land);
 
             const item = document.createElement('div');
@@ -112,7 +113,7 @@ export default class SearchBarView extends HTMLElement {
             info.appendChild(sub);
             item.appendChild(badge);
             item.appendChild(info);
-            item.addEventListener('click', () => this._onResultClick!(land.id));
+            item.addEventListener('click', () => this._onResultClick!(landGeom));
 
             this._resultsEl!.appendChild(item);
         }

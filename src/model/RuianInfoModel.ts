@@ -1,5 +1,5 @@
 import * as L from "leaflet";
-import {GeoJSON, type LeafletMouseEvent} from "leaflet";
+import {GeoJSON, type LatLng, type LeafletMouseEvent} from "leaflet";
 import RuianConnector from "../ruian/RuianConnector";
 import RuianInfoView, { type RuianData } from "../view/RuianInfo/RuianInfoView";
 import type SearchBarView from "../view/SearchBar/SearchBarView";
@@ -24,17 +24,18 @@ export default class RuianInfoModel {
         this._searchBarView.onResultClickHandler(this._onLandResultClick.bind(this));
     }
 
-    private async _onMapClick(e: LeafletMouseEvent) {
+    private async _onMapClick(e?: LeafletMouseEvent, preDefinedLatlng?: LatLng) {
         this._searchBarView.clearResults();
-        const latlng = this._epsg5514.project(e.latlng);
+
+        const latlng = this._epsg5514.project(e ? e.latlng : preDefinedLatlng!);
 
         const popup = L.popup({ className: 'ruian-popup-wrapper', maxWidth: 300 })
-            .setLatLng(e.latlng)
+            .setLatLng(e ? e.latlng : preDefinedLatlng!)
             .setContent(RuianInfoView.renderLoading())
             .openOn(this._map);
         this._currentPopup = popup;
 
-        const data = await this._getRUIANObjects(latlng.x, latlng.y);
+        const data = await this._getRUIANObjects(latlng!.x, latlng!.y);
 
         if (this._currentPopup === popup && popup.isOpen()) {
             popup.setContent(RuianInfoView.render(data));
@@ -43,7 +44,9 @@ export default class RuianInfoModel {
             });
             if (data.land) {
                 this._removeGeoJSONLands();
-                if (this._map.getZoom() >= 9) {
+                // if preDefinedLatlng is present land is displayed after search and map is flying to bounds
+                // in that time zoom is not greater than 9 yet
+                if (this._map.getZoom() >= 9 || preDefinedLatlng) {
                     const geoJsonLand = L.geoJson(data.land as any);
                     this._geoJSONLands.push(geoJsonLand);
                 }
@@ -51,6 +54,14 @@ export default class RuianInfoModel {
         }
 
         this._renderGeoJSONLands();
+    }
+
+    private async _onLandResultClick(landGeom: any) {
+        const geoJsonLand = L.geoJSON(landGeom);
+
+        const center = geoJsonLand.getBounds().getCenter();
+        this._map.flyTo(center, 12, {duration: 1});
+        await this._onMapClick(undefined, center);
     }
 
     private async _onRUIANSearch(value: string) {
@@ -79,9 +90,6 @@ export default class RuianInfoModel {
         this._searchBarView.renderResults(results?.features ?? []);
     }
 
-    private _onLandResultClick(id: number) {
-        console.log(id);
-    }
 
     private _removeGeoJSONLands() {
         for (const geoJSON of this._geoJSONLands) {
