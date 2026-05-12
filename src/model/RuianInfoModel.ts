@@ -1,4 +1,5 @@
 import * as L from "leaflet";
+import "leaflet-draw";
 import {GeoJSON, type LatLng, type LeafletMouseEvent} from "leaflet";
 import RuianConnector from "../ruian/RuianConnector";
 import RuianInfoView, { type RuianData } from "../view/RuianInfo/RuianInfoView";
@@ -10,6 +11,7 @@ export default class RuianInfoModel {
     private _ruianConnector: RuianConnector;
     private _currentPopup: L.Popup | null = null;
     private _searchBarView: SearchBarView;
+    private _isDrawing: boolean = false;
 
     private _geoJSONLands: GeoJSON[] = [];
 
@@ -18,6 +20,8 @@ export default class RuianInfoModel {
         this._epsg5514 = epsg5514;
         this._ruianConnector = ruianConnector;
         this._map.on('click', this._onMapClick.bind(this));
+        this._map.on(L.Draw.Event.DRAWSTART, () => { this._isDrawing = true; });
+        this._map.on(L.Draw.Event.DRAWSTOP, () => { this._isDrawing = false; });
         this._searchBarView = searchBarView;
 
         this._searchBarView.onSearchClickHandler(this._onRUIANSearch.bind(this));
@@ -25,6 +29,7 @@ export default class RuianInfoModel {
     }
 
     private async _onMapClick(e?: LeafletMouseEvent, preDefinedLatlng?: LatLng) {
+        if (this._isDrawing) return;
         this._searchBarView.clearResults();
 
         const latlng = this._epsg5514.project(e ? e.latlng : preDefinedLatlng!);
