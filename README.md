@@ -15,6 +15,7 @@ npm install leaflet
 ```
 
 ## Použití
+Je nutné mít vytvořeny <div> element s ID, které je nutné předat do MapWindow kontruktoru. V případě ID="map" není nutné nic předávat, neboť "map" je defaultní hodnota pro HTML element mapy.
 
 ### S bundlerem (webpack, vite, ...)
 
