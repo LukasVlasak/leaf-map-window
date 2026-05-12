@@ -28,13 +28,13 @@ const EPSG5514 = new L.Proj.CRS(
     }
 );
 export default class MapWindow {
-    map: L.Map;
-    element: string;
+    private _map: L.Map;
+    private _element: string;
 
     constructor(element: string = 'map', view: L.LatLngExpression = [50.08, 14.44], zoom: number = 7) {
-        this.element = element;
-        this.map = L.map(element, { attributionControl: false, crs: EPSG5514, maxZoom: 14 }).setView(view, zoom);
-        this.map.zoomControl.setPosition('bottomright');
+        this._element = element;
+        this._map = L.map(element, { attributionControl: false, crs: EPSG5514, maxZoom: 14 }).setView(view, zoom);
+        this._map.zoomControl.setPosition('bottomright');
     }
 
     init(): void {
@@ -42,39 +42,39 @@ export default class MapWindow {
     }
 
     private initView(): void {
-        const container = this.map.getContainer();
+        const container = this._map.getContainer();
 
         const mapLayersPanelView = new MapLayersPanelView();
         container.appendChild(mapLayersPanelView);
 
         const layerStore = new LayerStore();
-        new MapLayersModel(mapLayersPanelView.mapLayersView, this.map, layerStore);
+        new MapLayersModel(mapLayersPanelView.mapLayersView, this._map, layerStore);
 
-        const objectStore = new ObjectStore(this.map);
-        const mapObjectsModel = new MapObjectsModel(mapLayersPanelView.mapObjectsView, this.map, objectStore);
+        const objectStore = new ObjectStore(this._map);
+        const mapObjectsModel = new MapObjectsModel(mapLayersPanelView.mapObjectsView, this._map, objectStore);
 
         const canvasView = new CanvasView();
         document.body.appendChild(canvasView);
-        const canvasModel = new CanvasModel(mapObjectsModel, canvasView, this.map);
+        const canvasModel = new CanvasModel(mapObjectsModel, canvasView, this._map);
 
         const leftSideBarView = new LeftSidebarView();
         container.appendChild(leftSideBarView);
-        new LeftSidebarModel(mapObjectsModel, leftSideBarView, this.map, this.element, canvasModel);
+        new LeftSidebarModel(mapObjectsModel, leftSideBarView, this._map, this._element, canvasModel);
 
         const mapControlView = new MapControlView();
         container.appendChild(mapControlView);
-        new MapControlModel(mapControlView, this.map);
+        new MapControlModel(mapControlView, this._map);
 
         container.appendChild(new SearchBarView());
 
         const mapStatusBarView = new MapStatusBarView();
         container.appendChild(mapStatusBarView);
-        new MapStatusBarModel(mapStatusBarView, this.map);
+        new MapStatusBarModel(mapStatusBarView, this._map);
 
         const searchBar = new SearchBarView();
         container.appendChild(searchBar);
         container.appendChild(new AttributionControlView());
 
-        new RuianInfoModel(this.map, EPSG5514, new RuianConnector(), searchBar);
+        new RuianInfoModel(this._map, EPSG5514, new RuianConnector(), searchBar);
     }
 }

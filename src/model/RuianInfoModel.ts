@@ -35,7 +35,7 @@ export default class RuianInfoModel {
             .openOn(this._map);
         this._currentPopup = popup;
 
-        const data = await this._getRUIANObjects(latlng!.x, latlng!.y);
+        const data = await this._getRUIANObjects(e!.latlng!.lng, e!.latlng!.lat);
 
         if (this._currentPopup === popup && popup.isOpen()) {
             popup.setContent(RuianInfoView.render(data));
