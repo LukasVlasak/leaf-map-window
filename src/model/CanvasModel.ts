@@ -1,9 +1,8 @@
-import {fabric} from "fabric";
+import { Canvas, Circle, Rect, Line, Polyline, Text, PencilBrush, type FabricObject, type TPointerEventInfo } from "fabric";
 import type CanvasView from "../view/components/Canvas/CanvasView";
-import type {IEvent} from "fabric/fabric-impl";
-import L, {LatLngBounds, type LatLngBoundsExpression} from "leaflet";
+import L, { LatLngBounds, type LatLngBoundsExpression } from "leaflet";
 import MapObject from "../objects/MapObject";
-import {DEFAULT_EDIT_COLORS} from "../view/MapObjects/MapObjectsView";
+import { DEFAULT_EDIT_COLORS } from "../view/MapObjects/MapObjectsView";
 import type MapObjectsModel from "./MapObjectsModel";
 
 const DEFAULT_CIRCLE_OPTIONS = {
@@ -11,9 +10,9 @@ const DEFAULT_CIRCLE_OPTIONS = {
     fill: '#1b11d9',
     stroke: '#000',
     strokeWidth: 3,
-    originX: 'center',
-    originY: 'center',
-    id: 'circle'
+    originX: 'center' as const,
+    originY: 'center' as const,
+    data: { id: 'circle' }
 }
 
 const DEFAULT_POLYGON_OPTIONS = {
@@ -22,15 +21,14 @@ const DEFAULT_POLYGON_OPTIONS = {
     fill: '#11d94d',
     stroke: '#000',
     strokeWidth: 3,
-    id: 'polygon'
+    data: { id: 'polygon' }
 }
 
 const DEFAULT_LINE_OPTIONS = {
     stroke: '#000',
-    // have to specify otherwise obj.get('fill') is not falsy
     fill: null,
     strokeWidth: 3,
-    id: 'line'
+    data: { id: 'line' }
 }
 
 const DEFAULT_POLYLINE_OPTIONS = {
@@ -39,7 +37,7 @@ const DEFAULT_POLYLINE_OPTIONS = {
     strokeWidth: 3,
     objectCaching: false,
     selectable: false,
-    id: 'polyline'
+    data: { id: 'polyline' }
 }
 
 const DEFAULT_POLYLINE_MARKER_OPTIONS = {
@@ -47,19 +45,19 @@ const DEFAULT_POLYLINE_MARKER_OPTIONS = {
     height: 10,
     fill: '#000',
     stroke: '#000',
-    originX: 'center',
-    originY: 'center',
+    originX: 'center' as const,
+    originY: 'center' as const,
     hoverCursor: 'pointer',
     selectable: false,
-    id: 'polylinePoint'
+    data: { id: 'polylinePoint' }
 }
 
 const DEFAULT_POINT_OPTIONS = {
     radius: 5,
     fill: '#000',
-    originX: 'center',
-    originY: 'center',
-    id: 'point'
+    originX: 'center' as const,
+    originY: 'center' as const,
+    data: { id: 'point' }
 }
 
 const DEFAULT_TEXT_OPTIONS = {
@@ -67,31 +65,31 @@ const DEFAULT_TEXT_OPTIONS = {
     top: 50,
     fill: "#000000",
     fontSize: 20,
-    id: 'text'
+    data: { id: 'text' }
 }
 
 export type DrawType = "circle" | "polygon" | "line" | "polyline" | "point" | "text" | "freedraw";
 
 export default class CanvasModel {
-    private _fabricCanvas;
+    private _fabricCanvas: Canvas;
 
     private _mapObjectsModel: MapObjectsModel;
     private _canvasView: CanvasView;
     private _map: L.Map;
 
     private _drawingMode: DrawType | undefined = undefined;
-    private _currDrawObject: undefined | fabric.Object = undefined;
+    private _currDrawObject: FabricObject | undefined = undefined;
 
-    // helper for deleting paths
     private _timeStamp: Date | undefined = undefined;
 
     private _polyLinePoints: {x: number, y: number}[] = [];
-    private _polyline: fabric.Polyline | undefined = undefined;
-    private _polyLineTempLine: fabric.Line | undefined = undefined;
-    private _polyLinePointMarkers: fabric.Rect[] = [];
+    private _polyline: Polyline | undefined = undefined;
+    private _polyLineTempLine: Line | undefined = undefined;
+    private _polyLinePointMarkers: Rect[] = [];
 
     constructor(mapObjectsModel: MapObjectsModel, canvasView: CanvasView, map: L.Map) {
-        this._fabricCanvas = new fabric.Canvas('canvas');
+        this._fabricCanvas = new Canvas('canvas');
+        this._fabricCanvas.freeDrawingBrush = new PencilBrush(this._fabricCanvas);
 
         this._mapObjectsModel = mapObjectsModel;
         this._canvasView = canvasView;
@@ -195,35 +193,32 @@ export default class CanvasModel {
         this._updateSaveBtnState();
     }
 
-    _onCanvasMouseDown(event: IEvent<MouseEvent>) {
+    _onCanvasMouseDown(event: TPointerEventInfo) {
         if (!this._drawingMode || this._fabricCanvas.isDrawingMode || this._drawingMode === "text") return;
 
-        const pointer = this._fabricCanvas.getPointer(event.e);
-        const startX = pointer.x;
-        const startY = pointer.y;
+        const startX = event.viewportPoint.x;
+        const startY = event.viewportPoint.y;
 
         switch (this._drawingMode) {
             case "circle":
-                this._currDrawObject = new fabric.Circle({
+                this._currDrawObject = new Circle({
                     left: startX,
                     top: startY,
                     ...DEFAULT_CIRCLE_OPTIONS
                 });
                 break;
             case "polygon":
-                this._currDrawObject = new fabric.Rect({
+                this._currDrawObject = new Rect({
                     left: startX,
                     top: startY,
                     ...DEFAULT_POLYGON_OPTIONS
                 });
                 break;
             case "line":
-                // ts-ignore because fill is null - typescript accepts only undefined but i cannot be undefined because after import it would be displayed as rectangle
-                // @ts-ignore
-                this._currDrawObject = new fabric.Line([startX, startY, startX, startY], DEFAULT_LINE_OPTIONS);
+                this._currDrawObject = new Line([startX, startY, startX, startY], DEFAULT_LINE_OPTIONS);
                 break;
             case "point":
-                this._currDrawObject = new fabric.Circle({
+                this._currDrawObject = new Circle({
                     ...DEFAULT_POINT_OPTIONS,
                     left: startX,
                     top: startY
@@ -238,10 +233,10 @@ export default class CanvasModel {
         if (this._drawingMode === "point") this._onCanvasMouseUp();
     }
 
-    _onCanvasMouseMove(event: IEvent<MouseEvent>) {
+    _onCanvasMouseMove(event: TPointerEventInfo) {
         if (this._fabricCanvas.isDrawingMode) return;
 
-        const pointer = this._fabricCanvas.getPointer(event.e);
+        const pointer = event.viewportPoint;
 
         if (this._drawingMode === 'polyline' && this._polyLineTempLine) {
             this._polyLineTempLine.set({ x2: pointer.x, y2: pointer.y });
@@ -251,15 +246,15 @@ export default class CanvasModel {
 
         if (this._currDrawObject === undefined) return;
 
-        if (this._currDrawObject instanceof fabric.Circle) {
+        if (this._currDrawObject instanceof Circle) {
             const radius = Math.sqrt(Math.pow(pointer.x - this._currDrawObject.left!, 2) + Math.pow(pointer.y - this._currDrawObject.top!, 2)) / 2;
             this._currDrawObject.set({ radius: radius });
-        } else if (this._currDrawObject instanceof fabric.Rect) {
+        } else if (this._currDrawObject instanceof Rect) {
             this._currDrawObject.set({
                 width: Math.abs(pointer.x - this._currDrawObject.left!),
                 height: Math.abs(pointer.y - this._currDrawObject.top!)
             });
-        } else if (this._currDrawObject instanceof fabric.Line) {
+        } else if (this._currDrawObject instanceof Line) {
             this._currDrawObject.set({x2: pointer.x, y2: pointer.y});
         }
 
@@ -272,24 +267,22 @@ export default class CanvasModel {
         this._exitDrawingMode();
     }
 
-    _handlePolyline(event: IEvent<MouseEvent>, startX: number, startY: number) {
+    _handlePolyline(event: TPointerEventInfo, startX: number, startY: number) {
         if (this._polyLinePointMarkers.length > 1 && event.target === this._polyLinePointMarkers.at(-1)) {
             this._clearAndSavePolyline();
             return;
         }
 
-        if (event.target && (event.target as any).get('id') === 'polylinePoint') return;
+        if (event.target && (event.target as any).data?.id === 'polylinePoint') return;
 
-        const marker = new fabric.Rect({ left: startX, top: startY, ...DEFAULT_POLYLINE_MARKER_OPTIONS });
+        const marker = new Rect({ left: startX, top: startY, ...DEFAULT_POLYLINE_MARKER_OPTIONS });
         this._polyLinePointMarkers.push(marker);
         this._fabricCanvas.add(marker);
         this._polyLinePoints.push({ x: startX, y: startY });
 
         if (!this._polyline) {
-            // ts-ignore because fill is null - typescript accepts only undefined but i cannot be undefined because after import it would be displayed as rectangle
-            // @ts-ignore
-            this._polyline = new fabric.Polyline(this._polyLinePoints, DEFAULT_POLYLINE_OPTIONS);
-            this._polyLineTempLine = new fabric.Line([startX, startY, startX, startY], {
+            this._polyline = new Polyline(this._polyLinePoints, DEFAULT_POLYLINE_OPTIONS);
+            this._polyLineTempLine = new Line([startX, startY, startX, startY], {
                 stroke: DEFAULT_POLYLINE_OPTIONS.stroke,
                 strokeWidth: DEFAULT_POLYLINE_OPTIONS.strokeWidth,
                 strokeDashArray: [5, 5],
@@ -298,8 +291,7 @@ export default class CanvasModel {
             this._fabricCanvas.add(this._polyLineTempLine);
             this._fabricCanvas.add(this._polyline);
         } else {
-            (this._polyline as any).points = this._polyLinePoints;
-            // set start of dashed line - visible while mouse move
+            this._polyline.points = this._polyLinePoints;
             this._polyLineTempLine!.set({ x1: startX, y1: startY });
         }
 
@@ -312,8 +304,6 @@ export default class CanvasModel {
         this._fabricCanvas.remove(this._polyLineTempLine!);
         this._polyLineTempLine = undefined;
 
-        // fix bounding
-        (this._polyline as any)._setPositionDimensions({});
         this._polyline!.setCoords();
 
         this._polyline = undefined;
@@ -322,16 +312,15 @@ export default class CanvasModel {
         this._exitDrawingMode();
     }
 
-    _onCanvasPathCreated(e: IEvent<MouseEvent>) {
-        // the object e has 'path' but IEvent type doesnt declare it
-        const path = (e as any).path;
-        path.set({id: 'path', timeStamp: this._timeStamp});
+    _onCanvasPathCreated(e: { path: FabricObject }) {
+        const path = e.path;
+        (path as any).data = { id: 'path', timeStamp: this._timeStamp };
         this._canvasView.showPathButtons();
     }
 
     _onCancelPathClicked() {
         this._fabricCanvas.getObjects().forEach(o => {
-            if (o.get('timeStamp' as any) === this._timeStamp) {
+            if ((o as any).data?.timeStamp === this._timeStamp) {
                 this._fabricCanvas.remove(o);
             }
         });
@@ -347,32 +336,30 @@ export default class CanvasModel {
     _onCanvasSelectionUpdated() {
         const activeObjs = this._fabricCanvas.getActiveObjects();
 
-        // allow to select just 1 object
         if (activeObjs.length === 1) {
             const activeObj = activeObjs[0]!;
             this._canvasView.enableDeleteActiveElBtn();
 
-            if (activeObj.get('id' as any) === 'text') {
+            if ((activeObj as any).data?.id === 'text') {
                 this._canvasView.getChangeStrokeWidhtInput().enable();
-                this._canvasView.getChangeStrokeWidhtInput().setValue(activeObj.get("fontSize" as any));
-            // point has to have strokeWidth otherwise not rendered, however changing strokeWidth is not applicable
-            } else if (activeObj.get('strokeWidth') && activeObj.get('id' as any) !== 'point') {
+                this._canvasView.getChangeStrokeWidhtInput().setValue((activeObj as any).fontSize.toString());
+            } else if (activeObj.strokeWidth && (activeObj as any).data?.id !== 'point') {
                 this._canvasView.getChangeStrokeWidhtInput().enable();
-                this._canvasView.getChangeStrokeWidhtInput().setValue(activeObj.get("strokeWidth" as any));
+                this._canvasView.getChangeStrokeWidhtInput().setValue(activeObj.strokeWidth!.toString());
             } else {
                 this._canvasView.getChangeStrokeWidhtInput().disable();
             }
 
-            if (activeObj.get('stroke')) {
+            if (activeObj.stroke) {
                 this._canvasView.getChangeStrokeInput().enable();
-                this._canvasView.getChangeStrokeInput().setValue(activeObj.get('stroke')!);
+                this._canvasView.getChangeStrokeInput().setValue(activeObj.stroke as string);
             } else {
                 this._canvasView.getChangeStrokeInput().disable();
             }
 
-            if (activeObj.get('fill')) {
+            if (activeObj.fill) {
                 this._canvasView.getChangeColorInput().enable();
-                this._canvasView.getChangeColorInput().setValue(activeObj.get('fill') as any);
+                this._canvasView.getChangeColorInput().setValue(activeObj.fill as string);
             } else {
                 this._canvasView.getChangeColorInput().disable();
             }
@@ -389,15 +376,12 @@ export default class CanvasModel {
     }
 
     _editObjProp(prop: "fill" | "stroke" | "strokeWidth", e: Event) {
-        // input is either disabled or ONE obj that supports this edit is selected
         const activeObj = this._fabricCanvas.getActiveObject()!;
         // @ts-ignore
         const value = e.currentTarget.value;
         if (value) {
-            // text needs font size instead of strokeWidth
-            if (activeObj.get('id' as any) === 'text' && prop === "strokeWidth") {
-                // @ts-ignore
-                activeObj.set({'fontSize': parseInt(value)});
+            if ((activeObj as any).data?.id === 'text' && prop === "strokeWidth") {
+                (activeObj as any).set({'fontSize': parseInt(value)});
             } else if (prop === "strokeWidth") {
                 activeObj.set({strokeWidth: parseInt(value)});
             } else {
@@ -415,7 +399,7 @@ export default class CanvasModel {
     _onSaveTextClicked() {
         if (this._canvasView.getTextInput().getValue()) {
             const value = this._canvasView.getTextInput().getValue();
-            const text = new fabric.Text(value, DEFAULT_TEXT_OPTIONS);
+            const text = new Text(value, DEFAULT_TEXT_OPTIONS);
             this._fabricCanvas.add(text);
             this._canvasView.getTextInput().clear();
             this._updateSaveBtnState();
@@ -423,21 +407,20 @@ export default class CanvasModel {
     }
 
     _onDeleteActiveElement() {
-        // activeObject cannot be null bcs btn would be disabled if so
         this._fabricCanvas.remove(this._fabricCanvas.getActiveObject()!);
         this._updateSaveBtnState();
     }
 
     _disableCanvasSelection() {
         this._fabricCanvas.discardActiveObject();
-        this._fabricCanvas.forEachObject((o) => {
+        this._fabricCanvas.getObjects().forEach((o) => {
             o.selectable = false;
         });
         this._fabricCanvas.renderAll();
     }
 
     _enableCanvasSelection() {
-        this._fabricCanvas.forEachObject((o) => {
+        this._fabricCanvas.getObjects().forEach((o) => {
             o.selectable = true;
         });
         this._fabricCanvas.renderAll();
@@ -446,25 +429,23 @@ export default class CanvasModel {
     /**
      * canvasContent is:
      * JSON.stringify({
-     *      ...this._fabricCanvas.toJSON(['id']),
-     *      height: this._fabricCanvas.getHeight(),
-     *      width: this._fabricCanvas.getWidth(),
+     *      ...this._fabricCanvas.toJSON(),
+     *      height: this._fabricCanvas.height,
+     *      width: this._fabricCanvas.width,
      *      zoom: this._map.getZoom()
      * });
      */
-    loadCanvasContent(canvasContent: any, coordinates: L.LatLng[][]) {
-        this._fabricCanvas.loadFromJSON(canvasContent, () => {
-            this._fabricCanvas.setWidth(canvasContent.width);
-            this._fabricCanvas.setHeight(canvasContent.height);
-            this._fabricCanvas.renderAll();
+    async loadCanvasContent(canvasContent: any, coordinates: L.LatLng[][]) {
+        await this._fabricCanvas.loadFromJSON(canvasContent);
+        this._fabricCanvas.setDimensions({ width: canvasContent.width, height: canvasContent.height });
+        this._fabricCanvas.renderAll();
 
-            this.onCanvasSave(coordinates);
-            this.onCanvasClose();
-        });
+        this.onCanvasSave(coordinates);
+        this.onCanvasClose();
     }
 
     onCanvasSave(predefinedCoords?: L.LatLng[][]) {
-        const url = this._fabricCanvas.toDataURL({ format: 'png' });
+        const url = this._fabricCanvas.toDataURL({ format: 'png', multiplier: 1 });
 
         let coords;
         if (!predefinedCoords) {
@@ -480,15 +461,13 @@ export default class CanvasModel {
         });
         const canvasObj = new MapObject(coords, img, "canvas", img.options.opacity!, undefined, undefined, DEFAULT_EDIT_COLORS[5], 1);
         if (!predefinedCoords) {
-            // drawed canvas not imported
             canvasObj.setDefaultPopup();
         }
 
-        // for export
         canvasObj.fabricCanvasContent = this._fabricCanvas.getObjects().length > 0 ? JSON.stringify({
-            ...this._fabricCanvas.toJSON(['id']),
-            height: this._fabricCanvas.getHeight(),
-            width: this._fabricCanvas.getWidth(),
+            ...this._fabricCanvas.toJSON(),
+            height: this._fabricCanvas.height,
+            width: this._fabricCanvas.width,
             zoom: this._map.getZoom()
         }) : '';
 
@@ -520,10 +499,10 @@ export default class CanvasModel {
             const height = map.getSize().y - 200;
             this._canvasView.setContainerDimensions(width, height, 150, 100);
 
-            this._fabricCanvas.setWidth(width - 30); // 15px is sidebar width
+            // 15px is sidebar width
             // 97px is canvas-header height
             // 80px is control-section and canvas-footer height
-            this._fabricCanvas.setHeight(height - 97 - 80 - 80);
+            this._fabricCanvas.setDimensions({ width: width - 30, height: height - 97 - 80 - 80 });
         } else {
             this.onCanvasClose();
         }
