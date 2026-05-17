@@ -50,6 +50,10 @@ Soubory je nutné servovat přes HTTP server (např. `npx serve .`) — viz [OSM
 ## Vývoj
 
 ```bash
+
+# Git Clone
+git clone https://github.com/LukasVlasak/leaf-map-window
+
 # Instalace závislostí
 npm install
 
