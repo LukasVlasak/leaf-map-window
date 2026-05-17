@@ -13,7 +13,6 @@ export default class LayerStore {
             const group = new MapLayerGroup(groupData.name, groupData.layerTypes as "base" | "additional", groupData.defaultOpen);
             for (const layerData of groupData.layers as (typeof groupData.layers[number] & { additionalInfo?: string; attribution?: string; attributionLink?: string })[]) {
                 const layer = new MapLayer(
-                    layerData.serverType as "tile" | "wms" | "geojson",
                     layerData.url,
                     layerData.name,
                     layerData.description,
