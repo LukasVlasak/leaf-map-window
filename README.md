@@ -6,8 +6,29 @@ Live aplikace: https://leaf-map-window.onrender.com/
 
 ## Instalace
 
+### Přes Git
+
 ```bash
-npm install leaf-map-window
+git clone https://github.com/LukasVlasak/leaf-map-window.git
+cd leaf-map-window
+npm install
+npm run build
+```
+
+Hotový build se nachází ve složce `dist/`.
+
+### Alternativně přes npm pack
+
+Po buildu lze vytvořit přenositelný balíček `.tgz`:
+
+```bash
+npm pack
+```
+
+Vzniklý soubor `leaf-map-window-1.0.0.tgz` lze nainstalovat do jiného projektu:
+
+```bash
+npm install /cesta/k/leaf-map-window-1.0.0.tgz
 ```
 
 Knihovna vyžaduje Leaflet jako peer dependency — pokud ho projekt neobsahuje:
