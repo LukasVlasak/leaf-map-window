@@ -5,7 +5,6 @@
     "defaultOpen": true,
     "layers": [
       {
-        "serverType": "wms",
         "url": "https://ags.cuzk.gov.cz/arcgis1/services/ZTM/MapServer/WMSServer",
         "name": "ZTM",
         "description": "Základní topografická mapa České republiky.",
@@ -21,7 +20,6 @@
         "attributionLink": "https://geoportal.cuzk.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://ags.cuzk.gov.cz/arcgis1/services/ORTOFOTO/MapServer/WMSServer",
         "name": "ORTO",
         "description": "ORTOFOTO mapa České republiky.",
@@ -37,7 +35,6 @@
         "attributionLink": "https://geoportal.cuzk.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
         "name": "Stínovaný reliéf",
         "description": "Digitální model reliéfu terénu ČR 5. generace – šedý stínovaný reliéf.",
@@ -53,7 +50,6 @@
         "attributionLink": "https://geoportal.cuzk.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
         "name": "Barevný stínovaný reliéf",
         "description": "Digitální model reliéfu terénu ČR 5. generace – barevný stínovaný reliéf s výškovým tónováním.",
@@ -69,7 +65,6 @@
         "attributionLink": "https://geoportal.cuzk.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
         "name": "Výškový stínovaný reliéf",
         "description": "Digitální model reliéfu terénu ČR 5. generace – šedý stínovaný reliéf s 10násobným zdůrazněním výšek.",
@@ -92,7 +87,6 @@
     "defaultOpen": true,
     "layers": [
       {
-        "serverType": "wms",
         "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
         "name": "Stát",
         "description": "Státní hranice ČR – INSPIRE",
@@ -108,7 +102,6 @@
         "attributionLink": "https://geoportal.cuzk.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
         "name": "Kraje",
         "description": "Kraje České republiky – INSPIRE",
@@ -124,7 +117,6 @@
         "attributionLink": "https://geoportal.cuzk.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
         "name": "Okresy",
         "description": "Okresy České republiky – INSPIRE",
@@ -140,7 +132,6 @@
         "attributionLink": "https://geoportal.cuzk.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://services.cuzk.gov.cz/wms/inspire-au-wms.asp",
         "name": "Obce",
         "description": "Obce České republiky – INSPIRE",
@@ -163,7 +154,6 @@
     "defaultOpen": false,
     "layers": [
       {
-        "serverType": "wms",
         "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Silnice_Ldvn/ImageServer/WMSServer",
         "name": "Hlavní silnice – Ldvn",
         "description": "Strategická hluková mapa 2022 – hlavní silnice mimo aglomerace. Hlukový indikátor Ldvn => den-večer-noc",
@@ -180,7 +170,6 @@
         "attributionLink": "https://geoportal.mzcr.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Zeleznice_Ldvn/ImageServer/WMSServer",
         "name": "Hlavní železnice – Ldvn",
         "description": "Strategická hluková mapa 2022 – hlavní železniční tratě mimo aglomerace. Hlukový indikátor Ldvn => den-večer-noc",
@@ -197,7 +186,6 @@
         "attributionLink": "https://geoportal.mzcr.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Letiste_Ldvn/ImageServer/WMSServer",
         "name": "Letiště Praha Ruzyně – Ldvn",
         "description": "Strategická hluková mapa 2022 – hlavní letiště Václava Havla Praha Ruzyně. Hlukový indikátor Ldvn => den-večer-noc",
@@ -214,7 +202,6 @@
         "attributionLink": "https://geoportal.mzcr.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Celek_Ldvn/ImageServer/WMSServer",
         "name": "Aglomerace – celek – Ldvn",
         "description": "Strategická hluková mapa 2022 – souhrnná hluková zátěž v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
@@ -231,7 +218,6 @@
         "attributionLink": "https://geoportal.mzcr.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Silnice_Ldvn/ImageServer/WMSServer",
         "name": "Aglomerace – silnice – Ldvn",
         "description": "Strategická hluková mapa 2022 – silniční doprava v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
@@ -248,7 +234,6 @@
         "attributionLink": "https://geoportal.mzcr.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Zeleznice_Ldvn/ImageServer/WMSServer",
         "name": "Aglomerace – železnice – Ldvn",
         "description": "Strategická hluková mapa 2022 – železniční doprava v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
@@ -265,7 +250,6 @@
         "attributionLink": "https://geoportal.mzcr.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://geoportal.mzcr.cz/server/services/SHM2022/Aglomerace_Letiste_Ldvn/ImageServer/WMSServer",
         "name": "Aglomerace – letiště – Ldvn",
         "description": "Strategická hluková mapa 2022 – letecká doprava v aglomeracích. Hlukový indikátor Ldvn => den-večer-noc",
@@ -289,7 +273,6 @@
     "defaultOpen": false,
     "layers": [
       {
-        "serverType": "wms",
         "url": "https://gis.cenia.cz/geoserver/chmu_ovzdusi/wms",
         "name": "Imisní stanice ČHMÚ",
         "description": "Státní síť imisního monitoringu – stanice měřící kvalitu ovzduší",
@@ -305,7 +288,6 @@
         "attributionLink": "https://www.chmi.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.cenia.cz/geoserver/chmu_meteo_stanice/wms",
         "name": "Meteorologické stanice ČHMÚ",
         "description": "Síť automatických meteorologických, klimatologických a srážkoměrných stanic ČHMÚ na území ČR a stanice v síti RBSN.",
@@ -321,7 +303,6 @@
         "attributionLink": "https://www.chmi.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.cenia.cz/geoserver/chmu_voda/wms",
         "name": "Hydrologické stanice ČHMÚ",
         "description": "Síť stanic povrchových vod, pozorovací síť podzemních vod a síť pramenů.",
@@ -344,7 +325,6 @@
     "defaultOpen": false,
     "layers": [
       {
-        "serverType": "wms",
         "url": "https://mapy.geology.cz/arcgis/services/Geologie/geologicka_mapa50/MapServer/WMSServer",
         "name": "Geologická mapa",
         "description": "Bezešvá geologická mapa ČR (GEOCR50) – horniny, jejich hranice a tektonické linie.",
@@ -361,12 +341,11 @@
         "attributionLink": "https://cgs.gov.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://mapy.geology.cz/arcgis/services/Geohazardy/radon50/MapServer/WMSServer",
         "name": "Radonový index",
         "description": "Mapa radonového indexu z geologického podloží – důležité pro stavebnictví.",
         "minZoom": 1,
-        "maxZoom": 12,
+        "maxZoom": 6,
         "active": false,
         "opacity": 0.7,
         "wmsFormat": "image/png",
@@ -378,7 +357,6 @@
         "attributionLink": "https://cgs.gov.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://mapy.geology.cz/arcgis/services/Pudy/pudni_typy50/MapServer/WMSServer",
         "name": "Půdní typy",
         "description": "Půdní mapa ČR podle Taxonomického klasifikačního systému půd ČR.",
@@ -395,7 +373,6 @@
         "attributionLink": "https://cgs.gov.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://mapy.geology.cz/arcgis/services/Prozkoumanost/Vrtna_prozkoumanost/MapServer/WMSServer",
         "name": "Vrtná prozkoumanost",
         "description": "Databáze geologicky dokumentovaných objektů (vrtů) na území ČR.",
@@ -411,7 +388,6 @@
         "attributionLink": "https://cgs.gov.cz/"
       },
       {
-        "serverType": "wms",
         "url": "https://mapy.geology.cz/arcgis/services/Geohazardy/svahove_deformace/MapServer/WMSServer",
         "name": "Svahové deformace",
         "description": "Registr svahových deformací ČGS – sesuvy a další gravitační procesy.",
@@ -434,7 +410,6 @@
     "defaultOpen": false,
     "layers": [
       {
-        "serverType": "wms",
         "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
         "name": "Velkoplošná chráněná území",
         "description": "Národní parky (NP) a chráněné krajinné oblasti (CHKO) včetně ochranných pásem.",
@@ -450,7 +425,6 @@
         "attributionLink": "https://www.ochranaprirody.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
         "name": "Maloplošná chráněná území",
         "description": "Národní přírodní rezervace (NPR), národní přírodní památky (NPP), přírodní rezervace (PR) a přírodní památky (PP).",
@@ -466,7 +440,6 @@
         "attributionLink": "https://www.ochranaprirody.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
         "name": "Natura 2000 – evropsky významné lokality",
         "description": "Evropsky významné lokality (EVL) soustavy Natura 2000.",
@@ -482,7 +455,6 @@
         "attributionLink": "https://www.ochranaprirody.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
         "name": "Natura 2000 – ptačí oblasti",
         "description": "Ptačí oblasti soustavy Natura 2000.",
@@ -498,7 +470,6 @@
         "attributionLink": "https://www.ochranaprirody.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
         "name": "Geoparky",
         "description": "Geoparky UNESCO a národní geoparky ČR.",
@@ -514,7 +485,6 @@
         "attributionLink": "https://www.ochranaprirody.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
         "name": "Mokřady (Ramsar)",
         "description": "Mezinárodně významné mokřady dle Ramsarské úmluvy a národně významné mokřady ČR.",
@@ -530,7 +500,6 @@
         "attributionLink": "https://www.ochranaprirody.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://gis.nature.cz/arcgis/services/UzemneAnalytickePodklady/UdajeOUzemi/MapServer/WMSServer",
         "name": "Památné stromy",
         "description": "Lokality vyhlášených památných stromů, stromořadí a skupin stromů.",
@@ -546,7 +515,6 @@
         "attributionLink": "https://www.ochranaprirody.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://heis.vuv.cz/data/webmap/wms.dll",
         "name": "Záplavová území",
         "description": "Záplavová území stoleté vody. 1% pravděbodobnost překročení za rok.",
@@ -562,7 +530,6 @@
         "attributionLink": "https://www.vuv.cz"
       },
       {
-        "serverType": "wms",
         "url": "https://heis.vuv.cz/data/webmap/wms.dll",
         "name": "Aktivní zóna záplavového území",
         "description": "Aktivní zóna záplavového území pro Q100 – část provádějící rozhodující část povodňových průtoků.",
