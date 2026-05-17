@@ -4,6 +4,7 @@ import {
     type GeoJSONExportFeature, POLYGON_DRAW_OPTIONS,
     POLYLINE_DRAW_OPTIONS
 } from "../model/LeftSidebarModel";
+import DOMPurify from "dompurify";
 
 type LeafLayer = L.Polyline | L.Polygon | L.ImageOverlay | L.CircleMarker;
 export type LeafObjCoords = LatLngBoundsExpression | LatLng | LatLng[] | LatLng[][];
@@ -200,9 +201,10 @@ export default class MapObject {
     }
 
     set popup(value: string) {
-        this._popup = value;
-        if (value) {
-            this._layer.bindPopup(value).openPopup();
+        const sanitizedVal = DOMPurify.sanitize(value);
+        this._popup = sanitizedVal;
+        if (sanitizedVal) {
+            this._layer.bindPopup(sanitizedVal).openPopup();
         } else {
             this._layer.closePopup();
             this._layer.unbindPopup();
